@@ -20,7 +20,7 @@
 		<div id="chat">
 			<i id="avatar" class="face12"></i><input type="text" id="input" placeholder="Type your message...">
 		</div>
-		<button id="button" onclick="publish();return 0;">Send Message</button>
+		<button id="button">Send Message</button>
  		
 		<div id="presence">
 		 	<p id="presence"></p>
@@ -34,8 +34,7 @@
 	<script>
 	   (function(){
 
-	   		//reference to the send button element
-	   		var messageSend = document.querySelect("#button");
+	   		var chat_channel = "webinar-chat";
 
 
 	   		var pubnub = PUBNUB.init({
@@ -45,7 +44,7 @@
 	   			//windowing: 
 	   		});
 
-	   		pubnub.subscribe({channel: "webinar-chat",
+	   		pubnub.subscribe({channel: chat_channel,
 	   						  connect: function(res){
 	   						 	 console.log('connected');
 	   						  },
@@ -65,7 +64,7 @@
 	   								}
 	   						  });
 
-			/** 
+	   		/** 
 			 * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
 			 * the message
 			 **/
@@ -73,17 +72,21 @@
 
         		var message = {avatar: avatar.className, text: input.value}; //You can add any attributes you want
 
-        		p.publish({
-            				channel : channel, 
+        		pubnub.publish({
+            				channel : chat_channel, 
             				message : message, 
             				callback: function(res){
                 					console.log('this callback willl be called when the message is sent');
-            			  	}
+            			  	},
             				error: function(err){
             					  console.log('an error has occurred while publishing the message');
             				}
         				});
         	}
+
+        	//reference to the send button element
+	   		var messageSend = document.querySelector("#button");
+	   		messageSend.onclick = publish;
 
 	   })()
 	</script>
