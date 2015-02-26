@@ -20,7 +20,7 @@
 		<div id="chat">
 			<i id="avatar" class="face12"></i><input type="text" id="input" placeholder="Type your message...">
 		</div>
-		<button id="button">Send Message</button>
+		<button id="button" onclick="publish();return 0;">Send Message</button>
  		
 		<div id="presence">
 		 	<p id="presence"></p>
@@ -34,6 +34,10 @@
 	<script>
 	   (function(){
 
+	   		//reference to the send button element
+	   		var messageSend = document.querySelect("#button");
+
+
 	   		var pubnub = PUBNUB.init({
 	   			subscribe_key: 'demo-36',
 	   			publish_key: 'demo-36'
@@ -42,16 +46,13 @@
 	   		});
 
 	   		pubnub.subscribe({channel: "webinar-chat",
-	   						  callback: function(res){
-	   						  		//callback when subscribe is complete
-	   						  },
 	   						  connect: function(res){
 	   						  		//passes the origin connected 
 	   						  },
 	   						  disconnect: function(res){
 	   						  		//called when pubnub sdk is disconnected from the pubnub 
 	   						  },
-	   						  message: function(channel, envelope, timetoken){
+	   						  callback: function(channel, envelope, timetoken){
 	   						  	    /* called when a message arrives
 	   						  	     * parameters are:
 	   						  	     * channel: the name of the channel the message arrived on
@@ -62,6 +63,25 @@
 	   								 output.innerHTML = '<p><i class="' + m.avatar + '"></i><span>' +  m.text.replace( /[<>]/ig, '' ) + '</span></p>' + output.innerHTML; 
 	   						  });
 
+			/** 
+			 * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
+			 * the message
+			 **/
+			function publish() {
+
+        		var message = {avatar: avatar.className, text: input.value}; //You can add any attributes you want
+
+        		p.publish({
+            				channel : channel, 
+            				message : message, 
+            				callback: function(res){
+                					console.log('this callback willl be called when the message is sent');
+            			  	}
+            				error: function(err){
+            					  console.log('an error has occurred while publishing the message');
+            				}
+        				});
+        	}
 
 	   })()
 	</script>
