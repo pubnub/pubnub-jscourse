@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Simple Chat</title>
+	<meta name="description" content="Simple Chat Room">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='http://fonts.googleapis.com/css?family=Gorditas:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+	<header>
+		<h1>Uber Chat</h1>
+	</header>
+
+	<section id="main" role="main">
+		<div id="chat">
+			<i id="avatar" class="face12"></i><input type="text" id="input" placeholder="Type your message...">
+		</div>
+		<button id="button">Send Message</button>
+ 		
+		<div id="presence">
+		 	<p id="presence"></p>
+		 </div>
+		<div id="output"></div>
+	</section>
+
+	<footer></footer>
+
+	<script src="http://cdn.pubnub.com/pubnub-3.7.8.js"></script>
+	<script>
+	   (function(){
+
+	   		var pubnub = PUBNUB.init({
+	   			subscribe_key: 'demo-36',
+	   			publish_key: 'demo-36'
+	   			//ssl: true
+	   			//windowing: 
+	   		});
+
+	   		pubnub.subscribe({channel: "webinar-chat",
+	   						  callback: function(res){
+	   						  		//callback when subscribe is complete
+	   						  },
+	   						  connect: function(res){
+	   						  		//passes the origin connected 
+	   						  },
+	   						  disconnect: function(res){
+	   						  		//called when pubnub sdk is disconnected from the pubnub 
+	   						  },
+	   						  message: function(channel, envelope, timetoken){
+	   						  	    /* called when a message arrives
+	   						  	     * parameters are:
+	   						  	     * channel: the name of the channel the message arrived on
+	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
+	   						  	     * timetoken: the timetoken associated with this message. This is when the message was processed by pubnub
+	   						  	     */
+	   								 var output = document.querySelector("output");
+	   								 output.innerHTML = '<p><i class="' + m.avatar + '"></i><span>' +  m.text.replace( /[<>]/ig, '' ) + '</span></p>' + output.innerHTML; 
+	   						  });
+
+
+	   })()
+	</script>
+	
+</body>
+</html>

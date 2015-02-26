@@ -1,0 +1,173 @@
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+html {
+    height: 100%;
+}
+body {
+    padding: 0;
+    margin: 0;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Roboto Light", "Segoe UI Web Light", "Segoe UI Light", "Segoe UI Web Regular", "Segoe UI", Helvetica, Arial, sans-serif; 
+    background: #f9f9f9;
+    color: #333;
+}
+header {
+    height: 58px;
+    background: #fff;
+    border-top: 4px solid #ce1126;
+    border-bottom-color: #eee;
+}
+h1, h2, h3 {
+    margin: 0;
+    text-rendering: optimizeLegibility;
+}
+h1 {
+    font-size: 2em;
+    line-height: 58px;
+    text-align: center;
+    font-weight: normal;
+}
+input[type=text], button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 1px solid #ddd;
+    color: #333;
+    font-size: 1em;
+    padding: .7em 1em;
+    margin-bottom: 1em;
+    display: block;
+}
+button {
+    background: #e6e6e6;
+    text-shadow: 0 1px 0 #f3f3f3;
+    margin: .5em 0 2em 0;
+    width: 100%;
+}
+#chat {
+    height: 75px;
+    position: relative;
+}
+#chat i {
+    font-size: 75px;
+    position: absolute;
+
+}
+#chat input {
+    margin-left: 75px;
+    position: relative;
+    top: 15px;
+    width: calc(100% - 75px);
+}
+#main {
+    margin: 2em 1em 1em;
+}
+#main > p {
+    color: #ce1126;
+}
+#output p {
+    font-size: 1.2em;
+    margin: 0.6em;
+    position: relative;
+}
+#output i {
+    font-size: 40px;
+    position: absolute;
+    top: -5px;
+}
+#output span {
+    position: relative;
+    margin-left: 40px;
+}
+
+/* Font Icons */
+
+@font-face {
+    font-family: 'skipop';
+    src:url('../fonts/skipop.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="face"], [class*=" face"] {
+    font-family: 'skipop';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.face-1:before {
+    content: "\2a";
+}
+.face-2:before {
+    content: "\34";
+}
+.face-3:before {
+    content: "\36";
+}
+.face-4:before {
+    content: "\3b";
+}
+.face-5:before {
+    content: "\3e";
+}
+.face-6:before {
+    content: "\45";
+}
+.face-7:before {
+    content: "\47";
+}
+.face-8:before {
+    content: "\4d";
+}
+.face-9:before {
+    content: "\52";
+}
+.face-10:before {
+    content: "\59";
+}
+.face-11:before {
+    content: "\63";
+}
+.face-12:before {
+    content: "\6f";
+}
+.face-13:before {
+    content: "\7a";
+}
+
+.color-1 {
+    color: #393b79;
+}
+.color-2 {
+    color: #6b6ecf;
+}
+.color-3 {
+    color: #637939;
+}
+.color-4 {
+    color: #b5cf6b;
+}
+.color-5 {
+    color: #8c6d31;
+}
+.color-6 {
+    color: #e7ba52;
+}
+.color-7 {
+    color: #843c39;
+}
+.color-8 {
+    color: #d6616b;
+}
+.color-9 {
+    color: #7b4173;
+}
+.color-10 {
+    color: #ce6dbd;
+}
