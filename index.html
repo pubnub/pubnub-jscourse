@@ -42,24 +42,22 @@
 	   		});
 
 	   		pubnub.subscribe({channel: "webinar-chat",
-	   						  callback: function(res){
-	   						  		//callback when subscribe is complete
-	   						  },
 	   						  connect: function(res){
-	   						  		//passes the origin connected 
+	   						 	 console.log('connected');
 	   						  },
 	   						  disconnect: function(res){
 	   						  		//called when pubnub sdk is disconnected from the pubnub 
 	   						  },
-	   						  message: function(channel, envelope, timetoken){
+	   						  callback: function(m){
 	   						  	    /* called when a message arrives
 	   						  	     * parameters are:
 	   						  	     * channel: the name of the channel the message arrived on
 	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
 	   						  	     * timetoken: the timetoken associated with this message. This is when the message was processed by pubnub
 	   						  	     */
-	   								 var output = document.querySelector("output");
+	   								 var output = document.querySelector("#output");
 	   								 output.innerHTML = '<p><i class="' + m.avatar + '"></i><span>' +  m.text.replace( /[<>]/ig, '' ) + '</span></p>' + output.innerHTML; 
+	   								}
 	   						  });
 
 
