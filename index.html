@@ -13,24 +13,42 @@
 
 <body>
 	<header>
-		<h1>Uber Chat</h1>
+		<h1>Simple</h1>
 	</header>
 
 	<section id="main" role="main">
-		<div id="chat">
-			<i id="avatar" class="face12"></i><input type="text" id="input" placeholder="Type your message...">
+		
+		<div id="wrapper" class="centered">
+			<div id="presence-area" class="center">
+				<div id="user-count-container">
+			 		<p id="presence"></p>
+			 	</div>
+			 	<div id="userlist">
+			 		<ul id="userl">
+			 		</ul>
+			 	</div>
+			</div>
+
+			<div id="chat-area">
+				<div id="chat-output">
+				</div>
+				<div id="chat-control">
+					<div id="chat-text">
+						<input type="textarea" style="height:175px" id="input" rows="20" placeholder="Type your message...">
+					</div>
+					<div id="chat-send">
+						<i id="avatar" class="face12" style="display:none"></i><button id="send-button">Send Message</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		<button id="button">Send Message</button>
- 		
-		<div id="presence">
-		 	<p id="presence"></p>
-		 </div>
-		<div id="output"></div>
+
 	</section>
 
 	<footer></footer>
 
 	<script src="http://cdn.pubnub.com/pubnub-3.7.8.js"></script>
+	<script src="js/app.js"></script>
 	<script>
 	   (function(){
 
@@ -44,6 +62,20 @@
 	   			//windowing: 
 	   		});
 
+
+	   		//by this point your user should have logged into your application
+	   		//this is upstream of pubnub and you would use your TODO: some elegant explantion of what to do goes here
+	   		//Get the users avatar
+	   		//Get the users username
+
+	   		var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
+
+	   		var useravatar = document.querySelector("#avatar");
+	   		useravatar.className = avatarClassName;
+
+	   		var username = "freddyb";
+
+
 	   		pubnub.subscribe({channel: chat_channel,
 	   						  connect: function(res){
 	   						 	 console.log('connected');
@@ -52,17 +84,45 @@
 	   						  		//called when pubnub sdk is disconnected from the pubnub 
 	   						  },
 
-	   						  callback: function(m){
+	   						  callback: function(message,envelope,channel){
 	   						  	    /* called when a message arrives
 	   						  	     * parameters are:
 	   						  	     * channel: the name of the channel the message arrived on
 	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
-	   						  	     * timetoken: the timetoken associated with this message. This is when the message was processed by pubnub
+	   						  	     * message: the message
 	   						  	     */
-	   								 var output = document.querySelector("#output");
-	   								 output.innerHTML = '<p><i class="' + m.avatar + '"></i><span>' +  m.text.replace( /[<>]/ig, '' ) + '</span></p>' + output.innerHTML; 
-	   								}
-	   						  });
+	   						  	     var timetoken = envelope[1];
+	   						  	     var date = new Date(timetoken*1000);
+									 var hours = date.getHours();
+									 var minutes = "0" + date.getMinutes();
+									 var seconds = "0" + date.getSeconds();
+
+									// will display time in 10:30:23 format
+									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
+
+	   								 var output = document.querySelector("#chat-output");
+	   								 var bubbleClass="message-bubble";
+
+	   								 output.innerHTML =  output.innerHTML + '<div class="' + bubbleClass + '""><p><i class="' + message.avatar + '"></i><span>' +  message.text.replace( /[<>]/ig, '' ) + '</span></p></div>'; 
+	   						  },
+	   						  state: {'username': username, 'avatar': useravatar.className, 'now': new Date().toString()}, //this state will be sent when you subscribe. This is a good place to map useraccounts etc
+	   						  presence: function(m){
+
+	   						  		var presence = document.querySelector("#presence");
+	   						  		if(m.occupancy > 1) {
+                						presence.textContent = m.occupancy + ' people online';
+            						} else {
+                						presence.textContent = 'Nobody else is online';
+            						}
+
+            						Util.updateUserList(m);
+
+	   						  }
+	   		});
+
+
+			
+
 
 	   		/** 
 			 * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
@@ -70,6 +130,7 @@
 			 **/
 			function publish() {
 
+				var avatar = document.querySelector("#avatar");
         		var message = {avatar: avatar.className, text: input.value}; //You can add any attributes you want
 
         		pubnub.publish({
@@ -81,11 +142,14 @@
             				error: function(err){
             					  console.log('an error has occurred while publishing the message');
             				}
+
         				});
+
+        		input.value = ' ';
         	}
 
         	//reference to the send button element
-	   		var messageSend = document.querySelector("#button");
+	   		var messageSend = document.querySelector("#send-button");
 	   		messageSend.onclick = publish;
 
 	   })()

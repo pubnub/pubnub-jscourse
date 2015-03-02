@@ -7,9 +7,17 @@ body {
     padding: 0;
     margin: 0;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Roboto Light", "Segoe UI Web Light", "Segoe UI Light", "Segoe UI Web Regular", "Segoe UI", Helvetica, Arial, sans-serif; 
-    background: #f9f9f9;
+    background:#e6e6e6;
     color: #333;
 }
+
+
+.centered {
+    margin: 0 auto;
+    text-align: left;
+    width: 800px;
+}
+
 header {
     height: 58px;
     background: #fff;
@@ -36,47 +44,169 @@ input[type=text], button {
     margin-bottom: 1em;
     display: block;
 }
-button {
+
+input[type=textarea] {
+    white-space: pre-wrap;
+    z-index: auto;
+    position: relative;
+    line-height: 16.5454540252686px;
+    font-size: 14px;
+    -webkit-transition: none; 
+    transition: none;
+    font-family: Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, 'serif Menlo', Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+    height: 218px;
+    overflow: auto;
+    background: transparent !important;
+}
+
+
+ #chat-control input {
+ margin-left: 5px;
+position: relative;
+top: 15px;
+width: 100%;
+margin-right: 5px;
+overflow: scroll;
+}
+
+#send-button {
     background: #e6e6e6;
     text-shadow: 0 1px 0 #f3f3f3;
     margin: .5em 0 2em 0;
     width: 100%;
 }
-#chat {
-    height: 75px;
-    position: relative;
+
+#wrapper {
+    padding: 0px;
+    width: 960px;
+    height: 1024px;
+    background: #ffffff;
 }
-#chat i {
-    font-size: 75px;
-    position: absolute;
+
+#presence-area {
+    width: 20%;
+    position: relative;
+    float: left;
+    display: block;
+    border: 2px solid;
+    height: 100%
+}
+
+#presence-area li {
+    list-style-type: none;
+    padding-left: 5px;
+}
+
+#presence-area li.online {
+    font-weight: bold;
+    color: #33FF33;
+}
+
+#presence-area li.offline {
+    font-weight: bold;
+    color: #33FF33;
 
 }
-#chat input {
-    margin-left: 75px;
+
+#user-count-container p {
+    text-align: center;
+    font-weight: bold;
+}
+
+#chat-area {
+    width: 80%;
+    height: 100%;
+    float: left;
     position: relative;
-    top: 15px;
-    width: calc(100% - 75px);
+    display: block;
+    border: 1px;
+    /*border-bottom-style: dashed;*/
 }
-#main {
-    margin: 2em 1em 1em;
+
+
+#chat-control {
+    position: relative;
+    display: block;
+    width: 100%;
+    border: 1px solid;
+    padding: 0px;
+    height:20%;
 }
-#main > p {
-    color: #ce1126;
+
+#chat-control i {
+    font-size: 75px;
+    position: absolute;
+  }
+
+
+
+#chat-output {
+    position: relative;
+    clear: both;
+    width: 100%;
+    height: 80%;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin: 1px;
+    overflow: scroll;
+    position: relative;
+    background: rgba(255,255,255,0.8);
+    overflow: scroll;
+    overflow-x: hidden;
+    padding: 16px 10px 10px 10px;
+    font-family: Monaco, mono;
+    font-size: 10px;
+    line-height: 11px;
+    word-wrap: break-word;
+    word-break: break-all;
+    color: #130404;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: inset 0px 8px 20px 2px rgba(255,255,255,0.2);
 }
-#output p {
+
+
+
+#chat-output p {
     font-size: 1.2em;
     margin: 0.6em;
     position: relative;
 }
-#output i {
+#chat-output i {
     font-size: 40px;
     position: absolute;
     top: -5px;
 }
-#output span {
+#chat-output span {
     position: relative;
     margin-left: 40px;
 }
+
+
+
+#chat-text {
+    position: relative;
+    float: left;
+    display: block;
+    width: 90%;
+}
+
+#chat-send {
+    position: relative;
+    float: left;
+    display: block;
+    width: 10%;   
+}
+
+
+#main {
+    margin: 2em 1em 1em;
+    background-color: #e6e6e6;
+}
+#main > p {
+    color: #ce1126;
+}
+
 
 /* Font Icons */
 
@@ -171,3 +301,90 @@ button {
 .color-10 {
     color: #ce6dbd;
 }
+
+
+/*chat bubbles */
+.bubble {
+    background-image: linear-gradient(bottom, rgb(210,244,254) 25%, rgb(149,194,253) 100%);
+background-image: -o-linear-gradient(bottom, rgb(210,244,254) 25%, rgb(149,194,253) 100%);
+background-image: -moz-linear-gradient(bottom, rgb(210,244,254) 25%, rgb(149,194,253) 100%);
+background-image: -webkit-linear-gradient(bottom, rgb(210,244,254) 25%, rgb(149,194,253) 100%);
+background-image: -ms-linear-gradient(bottom, rgb(210,244,254) 25%, rgb(149,194,253) 100%);
+background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.25, rgb(210,244,254)),
+    color-stop(1, rgb(149,194,253))
+);
+    border: solid 1px rgba(0, 0, 0, 0.5);
+    /* vendor rules */
+    border-radius: 20px;
+    /* vendor rules */
+    box-shadow: inset 0 5px 5px rgba(255, 255, 255, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+    /* vendor rules */
+    box-sizing: border-box;
+    clear: both;
+    float: left;
+    margin-bottom: 20px;
+    padding: 8px 30px;
+    position: relative;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+    width: auto;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.bubble:before, .bubble:after {
+    border-radius: 20px / 10px;
+    content: '';
+    display: block;
+    position: absolute;
+}
+
+.bubble:before {
+    border: 10px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: -7px;
+    z-index: -2;
+}
+
+.bubble:after {
+    border: 8px solid transparent;
+    border-bottom-color: #d2f4fe;
+    bottom: 1px;
+    left: -5px;
+}
+
+.bubble--alt {
+    background-image: linear-gradient(bottom, rgb(172,228,75) 25%, rgb(122,205,71) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(172,228,75) 25%, rgb(122,205,71) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(172,228,75) 25%, rgb(122,205,71) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(172,228,75) 25%, rgb(122,205,71) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(172,228,75) 25%, rgb(122,205,71) 100%);
+    background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.25, rgb(172,228,75)),
+    color-stop(1, rgb(122,205,71))
+);
+    float: right;
+}
+
+.bubble--alt:before {
+    border-bottom-color: rgba(0, 0, 0, 0.5);
+    border-radius: 20px / 10px;
+    left: auto;
+    right: -7px;
+}
+
+.bubble--alt:after {
+    border-bottom-color: #ace44b;
+    border-radius: 20px / 10px;
+    left: auto;
+    right: -5px;
+}
+
+
