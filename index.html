@@ -225,6 +225,11 @@
                 						presence.innerHTML = 'Nobody else is online';
             						}
 
+            						if(m.action === "state-change"){
+            							console.log('state-change event: ');
+            							console.dir(m);
+            						}
+
             						UI.updateUserList(m,myState);
 
 	   						  }
@@ -265,9 +270,9 @@
 	   			var txtUserCity = document.querySelector('#txtCity');
 	   			var txtUserCountry = document.querySelector('#txtCountry');
 
-	   			myState.username = txtUsername;
-	   			myState.city = txtCity;
-	   			myState.country = txtCountry;
+	   			myState.username = txtUsername.value;
+	   			myState.city = txtCity.value;
+	   			myState.country = txtCountry.value;
 
 	   			pubnub.state({	channel: chat_channel,
 	   							uuid:  myUUID,

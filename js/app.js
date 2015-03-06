@@ -6,11 +6,15 @@ var UI = {
 
         var userlist = document.querySelector("#userl");
         if((pmsg.action === 'leave') || (pmsg.action === 'timeout')){
-            userlist.children.forEach(function(e){
-                if(e.attrbutes['uuid'] === uuid){
-                    e.className = "list-group-item offline";
-                }
-            })
+            if(userlist.children){
+                userlist.children.forEach(function(e){
+                    if(e.attrbutes['data-uuid'] === uuid){
+                        e.className = "list-group-item offline";
+                        //remove the user that is no longer online
+                        userlist.children.removeChild(e);
+                    }
+                });
+            }
         }else if(pmsg.action === 'join'){
 
             var li = document.createElement('li');
@@ -24,6 +28,7 @@ var UI = {
 
             li.appendChild(userDiv);
             li.setAttribute("class","list-group-item online");
+            li.setAttribute("data-uuid",pmsg.uuid);
             userlist.appendChild(li);
         }
     },
