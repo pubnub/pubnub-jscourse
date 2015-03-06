@@ -8,45 +8,63 @@
 	<meta name="description" content="Simple Chat Room">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='http://fonts.googleapis.com/css?family=Gorditas:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" >
 	<link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body >
 	<header>
-		<h1>Simple</h1>
+		<h1>PubNub Simple Chat</h1>
 	</header>
 
 	<section id="main" role="main">
 		
-		<div id="wrapper" class="centered">
-			<div id="presence-area" class="center">
-				<div id="user-count-container">
-			 		<p id="presence"></p>
-			 	</div>
-			 	<div id="userlist">
-			 		<ul id="userl">
-			 		</ul>
-			 	</div>
-			</div>
+		<div  class="container">
+			
+			<div class="row">
+				<div  class="col-md-4" style="position: relative;left: -6px;">
+					<div class="row">
+						<div id="user-count-container" class="well col-sm-12">
+			 				<p id="presence"><span class="badge"></span></p>
+			 			</div>
+			 		</div>
+			 		<div class="row">
+			 			<div  class="well col-sm-12" style="height:550px;">
+			 				<ul id="userl">
+			 				</ul>
+			 			</div>
+			 		</div>
+				</div>
 
-			<div id="chat-area">
-				<div id="chat-output">
-				</div>
-				<div id="chat-control">
-					<div id="chat-text">
-						<input type="textarea" style="height:175px" id="input" rows="20" placeholder="Type your message...">
+				<div  class="col-md-8" id="message-area">
+					<div class="row well">
+						<div id="chat-output" class="col-sm-12">
+							<ul id="chat-messages" class="list-group">
+							</ul>
+						</div>
 					</div>
-					<div id="chat-send">
-						<i id="avatar" class="face12" style="display:none"></i><button id="send-button">Send Message</button>
+					<div class="row well">
+						<div id="chat-control" class="col-sm-8">
+							<div class="message-console-send-area" class="col-sm-10">
+                            	<label class="message-console-textarea-title" for="message-console-input">message</label>
+                            	<textarea class="console-message" id="console-message-input" placeholder="Your message....."></textarea>
+                        	</div>
+                        	<div class="col-sm-4">
+                        		<button type="button" class="btn btn-default btn-lg" id="send-button">
+  									<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Send
+								</button>
+							</div>
+                    	</div>
 					</div>
 				</div>
-			</div>
-		</div>
+		    </div>
 
 	</section>
 
 	<footer></footer>
 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="bootstrap/js/bootstrap.js" ></script>
 	<script src="http://cdn.pubnub.com/pubnub-3.7.8.js"></script>
 	<script src="js/app.js"></script>
 	<script>
@@ -57,8 +75,9 @@
 
 	   		var pubnub = PUBNUB.init({
 	   			subscribe_key: 'demo-36',
-	   			publish_key: 'demo-36'
-	   			//ssl: true
+	   			publish_key: 'demo-36',
+	   			//ssl: true,
+	   			restore: true,
 	   			//windowing: 
 	   		});
 
@@ -70,10 +89,9 @@
 
 	   		var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
 
-	   		var useravatar = document.querySelector("#avatar");
-	   		useravatar.className = avatarClassName;
 
 	   		var username = "freddyb";
+	   		var myState = {'username': username, 'avatar': avatarClassName }; //this state 
 
 
 	   		pubnub.subscribe({channel: chat_channel,
@@ -85,6 +103,45 @@
 	   						  },
 
 	   						  callback: function(message,envelope,channel){
+
+	   						  		var nPanel = document.createElement("div");
+	   						  		nPanel.className = "panel panel-default";
+	   						  		
+	   						  		var nPanelHeader = document.createElement("div");
+	   						  		nPanelHeader.className = "panel-heading";
+	   						  		nPanelHeader.innerHTML = 
+	   						  		'<i class="' + message.avatar + '"></i>' + '<h3 class="panel-title msg-header">' 
+	   						  		+ message.from + '</h3>';
+	   						  		
+
+	   						  		nPanel.appendChild(nPanelHeader);
+
+	   						  		var nPanelContent = document.createElement('div');
+	   						  		nPanelContent.className = "panel-body";
+
+	   						  		var newChatMessage = document.createElement("div");
+	   						  		//var newAvatar = document.createElement("div");
+
+	   						  		//newAvatar.innerHTML = '<i class="' + message.avatar + '"></i>';
+	   						  		//newAvatar.className = "chat-message-avatar";
+
+									newChatMessage.innerHTML = '<p><span>'  + message.text.replace( /[<>]/ig, '' ) + '</span></p>'; 
+	   						  		newChatMessage.className = "chat-message";
+
+	   						  		nPanelContent.appendChild(newChatMessage);
+	   						  		nPanel.appendChild(nPanelContent);
+
+	   						  		var chatMessageLst = document.querySelector("#chat-messages");
+	   						  		var newChatMessageListItem = document.createElement("li");
+	   						  		newChatMessageListItem.className = "list-group-item";
+
+									//newChatMessageListItem.appendChild(newAvatar);
+	   						  		//newChatMessageListItem.appendChild(newChatMessage);
+	   						  		newChatMessageListItem.appendChild(nPanel);
+	   						  		//append it to the list
+	   						  		chatMessageLst.appendChild(newChatMessageListItem);
+
+
 	   						  	    /* called when a message arrives
 	   						  	     * parameters are:
 	   						  	     * channel: the name of the channel the message arrived on
@@ -100,28 +157,24 @@
 									// will display time in 10:30:23 format
 									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
 
-	   								 var output = document.querySelector("#chat-output");
-	   								 var bubbleClass="message-bubble";
-
-	   								 output.innerHTML =  output.innerHTML + '<div class="' + bubbleClass + '""><p><i class="' + message.avatar + '"></i><span>' +  message.text.replace( /[<>]/ig, '' ) + '</span></p></div>'; 
+	   								 //var output = document.querySelector("#chat-output");
+	   								 //var bubbleClass="bubble";
+	   								 //output.innerHTML =  output.innerHTML + '<div class="' + bubbleClass + '""><p><i class="' + message.avatar + '"></i><span>' +  message.text.replace( /[<>]/ig, '' ) + '</span></p></div>'; 
 	   						  },
-	   						  state: {'username': username, 'avatar': useravatar.className, 'now': new Date().toString()}, //this state will be sent when you subscribe. This is a good place to map useraccounts etc
+	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
 	   						  presence: function(m){
 
 	   						  		var presence = document.querySelector("#presence");
 	   						  		if(m.occupancy > 1) {
-                						presence.textContent = m.occupancy + ' people online';
+                						presence.innerHTML = '<span class="badge">' + m.occupancy + '</span>' + ' people online';
             						} else {
-                						presence.textContent = 'Nobody else is online';
+                						presence.innerHTML = 'Nobody else is online';
             						}
 
-            						Util.updateUserList(m);
+            						UI.updateUserList(m,myState);
 
 	   						  }
 	   		});
-
-
-			
 
 
 	   		/** 
@@ -130,8 +183,8 @@
 			 **/
 			function publish() {
 
-				var avatar = document.querySelector("#avatar");
-        		var message = {avatar: avatar.className, text: input.value}; //You can add any attributes you want
+				var messageText = document.querySelector("#console-message-input");
+				var message = {from: username, avatar: avatarClassName, text: messageText.value}; //You can add any attributes you want
 
         		pubnub.publish({
             				channel : chat_channel, 
@@ -145,7 +198,7 @@
 
         				});
 
-        		input.value = ' ';
+        		messageText.value = ' ';
         	}
 
         	//reference to the send button element
