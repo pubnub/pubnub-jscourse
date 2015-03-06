@@ -17,12 +17,16 @@
 		<h1>PubNub Simple Chat</h1>
 	</header>
 
+	<div id="user-profile-modal" style="display:none" class=""
+
 	<section id="main" role="main">
 		
 		<div  class="container">
 			
 			<div class="row">
+				
 				<div  class="col-md-4" style="position: relative;left: -6px;">
+					
 					<div class="row">
 						<div id="user-count-container" class="well col-sm-12">
 			 				<p id="presence"><span class="badge"></span></p>
@@ -91,6 +95,7 @@
 
 
 	   		var username = "freddyb";
+	   		var city = "Portland";
 	   		var myState = {'username': username, 'avatar': avatarClassName }; //this state 
 
 
@@ -104,6 +109,23 @@
 
 	   						  callback: function(message,envelope,channel){
 
+
+	   						  		/* called when a message arrives
+	   						  	     * parameters are:
+	   						  	     * channel: the name of the channel the message arrived on
+	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
+	   						  	     * message: the message
+	   						  	     */
+	   						  	     var timetoken = envelope[1];
+	   						  	     var date = new Date(timetoken/10000000);
+									 var hours = date.getHours();
+									 var minutes = "0" + date.getMinutes();
+									 var seconds = "0" + date.getSeconds();
+
+									// will display time in 10:30:23 format
+									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
+
+
 	   						  		var nPanel = document.createElement("div");
 	   						  		nPanel.className = "panel panel-default";
 	   						  		
@@ -111,20 +133,16 @@
 	   						  		nPanelHeader.className = "panel-heading";
 	   						  		nPanelHeader.innerHTML = 
 	   						  		'<i class="' + message.avatar + '"></i>' + '<h3 class="panel-title msg-header">' 
-	   						  		+ message.from + '</h3>';
+	   						  		+ message.from  + ' wrote at: ' + formattedTime + '</h3>';
 	   						  		
-
 	   						  		nPanel.appendChild(nPanelHeader);
 
 	   						  		var nPanelContent = document.createElement('div');
 	   						  		nPanelContent.className = "panel-body";
 
 	   						  		var newChatMessage = document.createElement("div");
-	   						  		//var newAvatar = document.createElement("div");
-
-	   						  		//newAvatar.innerHTML = '<i class="' + message.avatar + '"></i>';
-	   						  		//newAvatar.className = "chat-message-avatar";
-
+	   						  		
+	   						  		
 									newChatMessage.innerHTML = '<p><span>'  + message.text.replace( /[<>]/ig, '' ) + '</span></p>'; 
 	   						  		newChatMessage.className = "chat-message";
 
@@ -141,25 +159,7 @@
 	   						  		//append it to the list
 	   						  		chatMessageLst.appendChild(newChatMessageListItem);
 
-
-	   						  	    /* called when a message arrives
-	   						  	     * parameters are:
-	   						  	     * channel: the name of the channel the message arrived on
-	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
-	   						  	     * message: the message
-	   						  	     */
-	   						  	     var timetoken = envelope[1];
-	   						  	     var date = new Date(timetoken*1000);
-									 var hours = date.getHours();
-									 var minutes = "0" + date.getMinutes();
-									 var seconds = "0" + date.getSeconds();
-
-									// will display time in 10:30:23 format
-									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
-
-	   								 //var output = document.querySelector("#chat-output");
-	   								 //var bubbleClass="bubble";
-	   								 //output.innerHTML =  output.innerHTML + '<div class="' + bubbleClass + '""><p><i class="' + message.avatar + '"></i><span>' +  message.text.replace( /[<>]/ig, '' ) + '</span></p></div>'; 
+	   						  	  
 	   						  },
 	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
 	   						  presence: function(m){
