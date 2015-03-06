@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 	<title>Simple Chat</title>
-	<meta name="description" content="Simple Chat Room">
+	<meta name="description" content="Simple Chat">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='http://fonts.googleapis.com/css?family=Gorditas:700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" >
@@ -13,32 +13,81 @@
 </head>
 
 <body >
-	<header>
-		<h1>PubNub Simple Chat</h1>
-	</header>
+
+	<div class="modal fade" id="profile-modal">
+  		<div class="modal-dialog">
+    		<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        				<h4 class="modal-title">Who are you?</h4>
+      				</div>
+      				<div class="modal-body">
+      				  <div class="row">
+      				  	<div class="col-sm-12">
+      				  		<label for="txtUsername">User Name:</label>
+        					<input type="text" id="txtUsername">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+        			  	<div class="col-sm-12">
+        			  		<label for="txtCity"><p>City:</p></label>
+        			  		<input type="text" id="txtCity">
+        			  	</div>
+        			  </div>
+        			  <div class="row">
+        			  	<div class="col-sm-12">
+        			  		<label for="txtCountry"><p>Country:</p></label>
+        			  		<input type="text" id="txtCountry">
+        			  	</div>
+        			  </div>
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-update-profile">Save changes</button>
+      				</div>
+    		</div><!-- /.modal-content -->	
+  		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+
+	
 
 	<section id="main" role="main">
 		
 		<div  class="container">
-			
+
+		  <div class="row">
+		  	<div class="col-lg-12 well well-lg" style="background-color: #708090">
+
 			<div class="row">
-				
-				<div  class="col-md-4" style="position: relative;left: -6px;">
+				<div class="col-sm-12">
 					
+							<button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="settings-button" data-toggle="modal" data-target="#profile-modal">
+  								<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+							</button>
+					
+			   </div>
+			</div> 
+			
+			<div class="row" >
+				
+				<div  class="col-md-4" style="position: relative;left: -3px;display:block">
 					<div class="row">
 						<div id="user-count-container" class="well col-sm-12">
 			 				<p id="presence"><span class="badge"></span></p>
 			 			</div>
 			 		</div>
 			 		<div class="row">
-			 			<div  class="well col-sm-12" style="height:550px;">
-			 				<ul id="userl">
+			 			<div  class="well col-sm-12" style="height:546px;padding: 18px">
+			 				<ul id="userl" class="list-group">
 			 				</ul>
 			 			</div>
 			 		</div>
 				</div>
 
 				<div  class="col-md-8" id="message-area">
+					
+
 					<div class="row well">
 						<div id="chat-output" class="col-sm-12">
 							<ul id="chat-messages" class="list-group">
@@ -61,6 +110,9 @@
 				</div>
 		    </div>
 
+		    </div>
+		    </div>
+
 	</section>
 
 	<footer></footer>
@@ -73,11 +125,12 @@
 	   (function(){
 
 	   		var chat_channel = "webinar-chat";
-
+	   		var myUUID = PUBNUB.uuid();
 
 	   		var pubnub = PUBNUB.init({
 	   			subscribe_key: 'demo-36',
 	   			publish_key: 'demo-36',
+	   			uuid: myUUID,
 	   			//ssl: true,
 	   			restore: true,
 	   			//windowing: 
@@ -94,7 +147,8 @@
 
 	   		var username = "freddyb";
 	   		var city = "Portland";
-	   		var myState = {'username': username, 'avatar': avatarClassName }; //this state 
+	   		var country = "United States";
+	   		var myState = {'username': username, 'avatar': avatarClassName, 'city': 'Uknown', country: 'Uknown'}; //this state 
 
 
 	   		pubnub.subscribe({channel: chat_channel,
@@ -106,7 +160,7 @@
 	   						  },
 
 	   						  callback: function(message,envelope,channel){
-
+	   						  //LAB#2
 
 	   						  		/* called when a message arrives
 	   						  	     * parameters are:
@@ -163,7 +217,7 @@
 	   						  },
 	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
 	   						  presence: function(m){
-
+	   						  		//LAB3
 	   						  		var presence = document.querySelector("#presence");
 	   						  		if(m.occupancy > 1) {
                 						presence.innerHTML = '<span class="badge">' + m.occupancy + '</span>' + ' people online';
@@ -182,7 +236,7 @@
 			 * the message
 			 **/
 			function publish() {
-
+				//#LAB3
 				var messageText = document.querySelector("#console-message-input");
 				var message = {from: username, avatar: avatarClassName, text: messageText.value}; //You can add any attributes you want
 
@@ -204,6 +258,28 @@
         	//reference to the send button element
 	   		var messageSend = document.querySelector("#send-button");
 	   		messageSend.onclick = publish;
+
+	   		//LAB2.1
+	   		function setUserProfile(){
+	   			var txtUserName = document.querySelector('#txtUsername');
+	   			var txtUserCity = document.querySelector('#txtCity');
+	   			var txtUserCountry = document.querySelector('#txtCountry');
+
+	   			myState.username = txtUsername;
+	   			myState.city = txtCity;
+	   			myState.country = txtCountry;
+
+	   			pubnub.state({	channel: chat_channel,
+	   							uuid:  myUUID,
+	   							state: myState });
+
+	   			//$('profile-modal').dismiss();
+
+	   		}
+
+	   		var updateProfileButton = document.querySelector('#btn-update-profile');
+	   		updateProfileButton.onclick = setUserProfile;
+
 
 	   })()
 	</script>

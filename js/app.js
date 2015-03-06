@@ -8,7 +8,7 @@ var UI = {
         if((pmsg.action === 'leave') || (pmsg.action === 'timeout')){
             userlist.children.forEach(function(e){
                 if(e.attrbutes['uuid'] === uuid){
-                    e.className = "offline";
+                    e.className = "list-group-item offline";
                 }
             })
         }else if(pmsg.action === 'join'){
@@ -23,8 +23,13 @@ var UI = {
             }
 
             li.appendChild(userDiv);
-            li.setAttribute("class","online");
+            li.setAttribute("class","list-group-item online");
             userlist.appendChild(li);
         }
+    },
+
+
+    'updateUserState': function(){
+
     }
 }
