@@ -17,8 +17,6 @@
 		<h1>PubNub Simple Chat</h1>
 	</header>
 
-	<div id="user-profile-modal" style="display:none" class=""
-
 	<section id="main" role="main">
 		
 		<div  class="container">
@@ -125,6 +123,8 @@
 									// will display time in 10:30:23 format
 									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
 
+									//everything below goes into UI..decompose
+									//message so they know what goes into a message
 
 	   						  		var nPanel = document.createElement("div");
 	   						  		nPanel.className = "panel panel-default";
