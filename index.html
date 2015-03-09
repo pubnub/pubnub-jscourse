@@ -65,7 +65,8 @@
 			
 			<div class="row" >
 				
-				<div  class="col-md-4" style="position: relative;left: -3px;display:block">
+				
+				<div  class="col-md-4" style="position: relative;left: -3px;display:none">
 					<div class="row">
 						<div id="user-count-container" class="well col-sm-12">
 			 				<p id="presence"><span class="badge"></span></p>
@@ -88,7 +89,7 @@
 							</ul>
 						</div>
 					</div>
-					<div class="row well">
+					<div class="row well" style="display:block;">
 						<div id="chat-control" class="col-sm-8">
 							<div class="message-console-send-area" class="col-sm-10">
                             	<label class="message-console-textarea-title" for="message-console-input">message</label>
@@ -127,31 +128,25 @@
 	   		var city = "Portland";
 	   		var country = "United States";
 	   		var myState = {'username': username, 'avatar': avatarClassName, 'location': 'Uknown'};
-	   		
-	   		if(localStorage.getItem('profileExists')){
-	   			//initalize the userState from localstorage..
-	   			//you could also retrieve a user profile from your backend systems
-	   			myState.username = localStorage.profileUserName;
-	   			myState.avatar   = localStorage.profileAvatarClassName;
-	   			myState.location = localStorage.profileLocation;
-	   		}
-
+	  
 	   		var myUUID = localStorage.getItem(subkey + "uuid");
 	   		var lastTimeToken = localStorage.getItem(subkey);
 
-	   		console.log('local storage had: ' + myUUID + ' for uuid and ' + ' ' + lastTimeToken);
-
+	  		//If we have a timeToken use it
 	   		if(lastTimeToken === null){
 	   			console.log('not using last token');
 	   			lastTimeToken = 0; //make it zero
 	   		}
 
+	   		//grab the last UUID so this browser only gets counted once
+	   		//presence uses UUID's as well, so if you generate a new uuid everytime
+	   		//a single browser will look like a different instance/user
 	   		if(myUUID === null){
 	   			myUUID = PUBNUB.uuid();
 	   		}
 
 
-	   		//LAB 1
+	   		//LAB1 BEGIN
 	   		var pubnub = PUBNUB.init({
 	   			subscribe_key: subkey,
 	   			publish_key: pubkey,
@@ -167,26 +162,6 @@
 	   						  timetoken: lastTimeToken,
 	   						  connect: function(res){
 	   						 	 console.log('connected');
-
-	   						 	 pubnub.history({
-	   						 	 	channel: chat_channel,
-	   						 	 	start: lastTimeToken,
-	   						 	 	count: 50,
-	   						 	 	include_token: true,
-	   						 	 	callback: function(m){
-	   						 	 		console.log('got history:');
-	   						 	 		m[0].forEach(function(e){ //First element is the history, last 2 are timestamps
-	   						 	 			if(typeof e === 'object'){
-	   						 	 				var msg = e.message;
-	   						 	 				var tt = e.timetoken;
-	   						 	 				
-	   						 	 				UI.addChatMessage(msg.text,UI.formatTimeToken(tt),msg.from,msg.avatar);
-	   						 	 			}
-	   						 	 		})
-	   						 	 	}
-	   						 	 })
-
-
 	   						  },
 	   						  disconnect: function(res){
 	   						  		//called when pubnub sdk is disconnected from the pubnub 
@@ -203,7 +178,7 @@
 	   						  		/* called when a message arrives
 	   						  	     * parameters are:
 	   						  	     * channel: the name of the channel the message arrived on
-	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
+	   						  	     * envelope: the complete envelope which contains an tuple of {message,timetoken,channel_name}
 	   						  	     * message: the message
 	   						  	     */
 	   						  	    var timeToken = envelope[1];
@@ -214,76 +189,16 @@
 									UI.addChatMessage(messageText,formattedTime,fromUser,avatar);
 	   						  	  
 	   						  },
-	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
-	   						  presence: function(m){
-	   						  		//LAB3
-	   						  		if(m.action === "state-change"){
-            							console.log('state-change event: ');
-            							UI.handleStateChange(m.action,m.uuid,m.data);
-            						}else if(m.action === "join"){
-            							console.log('join event');
-            							//get the state of the user
-            							pubnub.state({channel: chat_channel,
-            										  uuid: m.uuid,
-            										  callback: function(s){
-            										  	UI.handleStateChange('state-change',m.uuid,s);
-            										  }});
-
-            							UI.updateRoomCount(m.action,m.occupancy);
-            						}else if((m.action === "timeout") || (m.action === "leave")){
-            							console.log('timeout or leave event, remove the user element');
-            							UI.handleLeaveEvent(m.action,m.uuid); //Remove the user from the list of participants
-            							UI.updateRoomCount(m.action,m.occupancy); //Update the number of users present
-            						}
-	   						  }
+	   		
 	   		});
-			//LAB1
+			//LAB1 END
 
 
-
-			//update our state...this will trigger a state-change and should add the user to the occupants lists
-			//LAB2.1
-	   		function sendStateUpdate(){
-	   			var txtUserName    = document.querySelector('#txtUsername');
-	   			var txtLocation    = document.querySelector('#txtLocation');
-	   			
-	   			myState.username = txtUsername.value;
-	   			myState.location = txtLocation.value
-	   			
-	   			localStorage.setItem('profileUserName', txtUserName.value);
-	   			localStorage.setItem('profileLocation', txtLocation.value);
-	   			localStorage.setItem('profileAvatarClassName',avatarClassName);
-	   			localStorage.setItem('profileExists',true);
-
-	   			pubnub.state({	channel: chat_channel,
-	   							uuid:  myUUID,
-	   							state: myState });
-
-	   		}
-
-	   		var updateProfileButton = document.querySelector('#btn-update-profile');
-	   		updateProfileButton.onclick = sendStateUpdate;
-
-
-			if(myState.username === 'Unknown'){
-				//userhas not set his state.
-				$('#profile-modal').modal('show');
-			}else{
-				var txtUserName    = document.querySelector('#txtUsername');
-	   			var txtLocation    = document.querySelector('#txtLocation');
-	   			txtUsername.value = myState.username;
-	   			txtLocation.value = myState.location;
-	   			pubnub.state({	channel: chat_channel,
-	   							uuid:  myUUID,
-	   							state: myState });
-			}
-
-			
-		
 	   		/** 
 			 * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
 			 * the message
 			 **/
+			 //LAB2 BEGIN
 			function publish() {
 				//#LAB3
 				var messageText = document.querySelector("#console-message-input");
@@ -307,7 +222,7 @@
         	//reference to the send button element
 	   		var messageSend = document.querySelector("#send-button");
 	   		messageSend.onclick = publish;
-
+	   		//LAB2 END
 	   		
 
 
