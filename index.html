@@ -4,8 +4,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-	<title>Simple Chat</title>
-	<meta name="description" content="Simple Chat">
+	<title>JS Webinar Chat</title>
+	<meta name="description" content="JS Webinar Chat">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='http://fonts.googleapis.com/css?family=Gorditas:700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" >
@@ -19,7 +19,7 @@
     		<div class="modal-content">
       				<div class="modal-header">
         				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        				<h4 class="modal-title">Who are you?</h4>
+        				<h4 class="modal-title">Welcome, please let us know who you are:</h4>
       				</div>
       				<div class="modal-body">
       				  <div class="row">
@@ -30,14 +30,8 @@
         			  </div>
         			  <div class="row">
         			  	<div class="col-sm-12">
-        			  		<label for="txtCity"><p>City:</p></label>
-        			  		<input type="text" id="txtCity">
-        			  	</div>
-        			  </div>
-        			  <div class="row">
-        			  	<div class="col-sm-12">
-        			  		<label for="txtCountry"><p>Country:</p></label>
-        			  		<input type="text" id="txtCountry">
+        			  		<label for="txtLocation"><p>Where are you from:</p></label>
+        			  		<input type="text" id="txtLocation">
         			  	</div>
         			  </div>
       				</div>
@@ -124,43 +118,87 @@
 	<script>
 	   (function(){
 
+	   		//Init & Subscribe
 	   		var chat_channel = "webinar-chat";
-	   		var myUUID = PUBNUB.uuid();
+	   		var subkey = "demo-36";
+	   		var pubkey = "demo-36";
+			var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
+	   		var username = "Unknown";
+	   		var city = "Portland";
+	   		var country = "United States";
+	   		var myState = {'username': username, 'avatar': avatarClassName, 'location': 'Uknown'};
+	   		
+	   		if(localStorage.getItem('profileExists')){
+	   			//initalize the userState from localstorage..
+	   			//you could also retrieve a user profile from your backend systems
+	   			myState.username = localStorage.profileUserName;
+	   			myState.avatar   = localStorage.profileAvatarClassName;
+	   			myState.location = localStorage.profileLocation;
+	   		}
 
+	   		var myUUID = localStorage.getItem(subkey + "uuid");
+	   		var lastTimeToken = localStorage.getItem(subkey);
+
+	   		console.log('local storage had: ' + myUUID + ' for uuid and ' + ' ' + lastTimeToken);
+
+	   		if(lastTimeToken === null){
+	   			console.log('not using last token');
+	   			lastTimeToken = 0; //make it zero
+	   		}
+
+	   		if(myUUID === null){
+	   			myUUID = PUBNUB.uuid();
+	   		}
+
+
+	   		//LAB 1
 	   		var pubnub = PUBNUB.init({
-	   			subscribe_key: 'demo-36',
-	   			publish_key: 'demo-36',
+	   			subscribe_key: subkey,
+	   			publish_key: pubkey,
 	   			uuid: myUUID,
 	   			//ssl: true,
-	   			restore: true,
+	   			
 	   			//windowing: 
 	   		});
 
 
-	   		//by this point your user should have logged into your application
-	   		//this is upstream of pubnub and you would use your TODO: some elegant explantion of what to do goes here
-	   		//Get the users avatar
-	   		//Get the users username
-
-	   		var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
-
-
-	   		var username = "freddyb";
-	   		var city = "Portland";
-	   		var country = "United States";
-	   		var myState = {'username': username, 'avatar': avatarClassName, 'city': 'Uknown', country: 'Uknown'}; //this state 
-
-
 	   		pubnub.subscribe({channel: chat_channel,
+	   						  restore: true, //attempt to restore missing messages on reconnect
+	   						  timetoken: lastTimeToken,
 	   						  connect: function(res){
 	   						 	 console.log('connected');
+
+	   						 	 pubnub.history({
+	   						 	 	channel: chat_channel,
+	   						 	 	start: lastTimeToken,
+	   						 	 	count: 50,
+	   						 	 	include_token: true,
+	   						 	 	callback: function(m){
+	   						 	 		console.log('got history:');
+	   						 	 		m[0].forEach(function(e){ //First element is the history, last 2 are timestamps
+	   						 	 			if(typeof e === 'object'){
+	   						 	 				var msg = e.message;
+	   						 	 				var tt = e.timetoken;
+	   						 	 				
+	   						 	 				UI.addChatMessage(msg.text,UI.formatTimeToken(tt),msg.from,msg.avatar);
+	   						 	 			}
+	   						 	 		})
+	   						 	 	}
+	   						 	 })
+
+
 	   						  },
 	   						  disconnect: function(res){
 	   						  		//called when pubnub sdk is disconnected from the pubnub 
+	   						  		console.log('disconnect called');
+	   						  },
+
+	   						  reconnect: function(res){
+	   						  		console.log('reconnecting to pubnub');
 	   						  },
 
 	   						  callback: function(message,envelope,channel){
-	   						  //LAB#2
+	   						  //LAB#1
 
 	   						  		/* called when a message arrives
 	   						  	     * parameters are:
@@ -168,74 +206,80 @@
 	   						  	     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
 	   						  	     * message: the message
 	   						  	     */
-	   						  	     var timetoken = envelope[1];
-	   						  	     var date = new Date(timetoken/10000000);
-									 var hours = date.getHours();
-									 var minutes = "0" + date.getMinutes();
-									 var seconds = "0" + date.getSeconds();
-
-									// will display time in 10:30:23 format
-									var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);	
-
-									//everything below goes into UI..decompose
-									//message so they know what goes into a message
-
-	   						  		var nPanel = document.createElement("div");
-	   						  		nPanel.className = "panel panel-default";
-	   						  		
-	   						  		var nPanelHeader = document.createElement("div");
-	   						  		nPanelHeader.className = "panel-heading";
-	   						  		nPanelHeader.innerHTML = 
-	   						  		'<i class="' + message.avatar + '"></i>' + '<h3 class="panel-title msg-header">' 
-	   						  		+ message.from  + ' wrote at: ' + formattedTime + '</h3>';
-	   						  		
-	   						  		nPanel.appendChild(nPanelHeader);
-
-	   						  		var nPanelContent = document.createElement('div');
-	   						  		nPanelContent.className = "panel-body";
-
-	   						  		var newChatMessage = document.createElement("div");
-	   						  		
-	   						  		
-									newChatMessage.innerHTML = '<p><span>'  + message.text.replace( /[<>]/ig, '' ) + '</span></p>'; 
-	   						  		newChatMessage.className = "chat-message";
-
-	   						  		nPanelContent.appendChild(newChatMessage);
-	   						  		nPanel.appendChild(nPanelContent);
-
-	   						  		var chatMessageLst = document.querySelector("#chat-messages");
-	   						  		var newChatMessageListItem = document.createElement("li");
-	   						  		newChatMessageListItem.className = "list-group-item";
-
-									//newChatMessageListItem.appendChild(newAvatar);
-	   						  		//newChatMessageListItem.appendChild(newChatMessage);
-	   						  		newChatMessageListItem.appendChild(nPanel);
-	   						  		//append it to the list
-	   						  		chatMessageLst.appendChild(newChatMessageListItem);
-
+	   						  	    var timeToken = envelope[1];
+	   								var formattedTime = UI.formatTimeToken(timeToken);
+									var messageText = message.text;
+									var fromUser = message.from;
+									var avatar = message.avatar;
+									UI.addChatMessage(messageText,formattedTime,fromUser,avatar);
 	   						  	  
 	   						  },
 	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
 	   						  presence: function(m){
 	   						  		//LAB3
-	   						  		var presence = document.querySelector("#presence");
-	   						  		if(m.occupancy > 1) {
-                						presence.innerHTML = '<span class="badge">' + m.occupancy + '</span>' + ' people online';
-            						} else {
-                						presence.innerHTML = 'Nobody else is online';
-            						}
-
-            						if(m.action === "state-change"){
+	   						  		if(m.action === "state-change"){
             							console.log('state-change event: ');
-            							console.dir(m);
+            							UI.handleStateChange(m.action,m.uuid,m.data);
+            						}else if(m.action === "join"){
+            							console.log('join event');
+            							//get the state of the user
+            							pubnub.state({channel: chat_channel,
+            										  uuid: m.uuid,
+            										  callback: function(s){
+            										  	UI.handleStateChange('state-change',m.uuid,s);
+            										  }});
+
+            							UI.updateRoomCount(m.action,m.occupancy);
+            						}else if((m.action === "timeout") || (m.action === "leave")){
+            							console.log('timeout or leave event, remove the user element');
+            							UI.handleLeaveEvent(m.action,m.uuid); //Remove the user from the list of participants
+            							UI.updateRoomCount(m.action,m.occupancy); //Update the number of users present
             						}
-
-            						UI.updateUserList(m,myState);
-
 	   						  }
 	   		});
+			//LAB1
 
 
+
+			//update our state...this will trigger a state-change and should add the user to the occupants lists
+			//LAB2.1
+	   		function sendStateUpdate(){
+	   			var txtUserName    = document.querySelector('#txtUsername');
+	   			var txtLocation    = document.querySelector('#txtLocation');
+	   			
+	   			myState.username = txtUsername.value;
+	   			myState.location = txtLocation.value
+	   			
+	   			localStorage.setItem('profileUserName', txtUserName.value);
+	   			localStorage.setItem('profileLocation', txtLocation.value);
+	   			localStorage.setItem('profileAvatarClassName',avatarClassName);
+	   			localStorage.setItem('profileExists',true);
+
+	   			pubnub.state({	channel: chat_channel,
+	   							uuid:  myUUID,
+	   							state: myState });
+
+	   		}
+
+	   		var updateProfileButton = document.querySelector('#btn-update-profile');
+	   		updateProfileButton.onclick = sendStateUpdate;
+
+
+			if(myState.username === 'Unknown'){
+				//userhas not set his state.
+				$('#profile-modal').modal('show');
+			}else{
+				var txtUserName    = document.querySelector('#txtUsername');
+	   			var txtLocation    = document.querySelector('#txtLocation');
+	   			txtUsername.value = myState.username;
+	   			txtLocation.value = myState.location;
+	   			pubnub.state({	channel: chat_channel,
+	   							uuid:  myUUID,
+	   							state: myState });
+			}
+
+			
+		
 	   		/** 
 			 * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
 			 * the message
@@ -243,7 +287,7 @@
 			function publish() {
 				//#LAB3
 				var messageText = document.querySelector("#console-message-input");
-				var message = {from: username, avatar: avatarClassName, text: messageText.value}; //You can add any attributes you want
+				var message = {from: myState.username, avatar: myState.avatar, text: messageText.value}; //You can add any attributes you want
 
         		pubnub.publish({
             				channel : chat_channel, 
@@ -264,26 +308,7 @@
 	   		var messageSend = document.querySelector("#send-button");
 	   		messageSend.onclick = publish;
 
-	   		//LAB2.1
-	   		function setUserProfile(){
-	   			var txtUserName = document.querySelector('#txtUsername');
-	   			var txtUserCity = document.querySelector('#txtCity');
-	   			var txtUserCountry = document.querySelector('#txtCountry');
-
-	   			myState.username = txtUsername.value;
-	   			myState.city = txtCity.value;
-	   			myState.country = txtCountry.value;
-
-	   			pubnub.state({	channel: chat_channel,
-	   							uuid:  myUUID,
-	   							state: myState });
-
-	   			//$('profile-modal').dismiss();
-
-	   		}
-
-	   		var updateProfileButton = document.querySelector('#btn-update-profile');
-	   		updateProfileButton.onclick = setUserProfile;
+	   		
 
 
 	   })()
