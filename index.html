@@ -155,9 +155,8 @@
 	   		var pubnub = PUBNUB.init({
 	   			subscribe_key: subkey,
 	   			publish_key: pubkey,
-	   			uuid: myUUID,
+	   			uuid: myUUID
 	   			//ssl: true,
-	   			
 	   			//windowing: 
 	   		});
 
@@ -167,25 +166,6 @@
 	   						  timetoken: lastTimeToken,
 	   						  connect: function(res){
 	   						 	 console.log('connected');
-
-	   						 	 pubnub.history({
-	   						 	 	channel: chat_channel,
-	   						 	 	start: lastTimeToken,
-	   						 	 	count: 50,
-	   						 	 	include_token: true,
-	   						 	 	callback: function(m){
-	   						 	 		console.log('got history:');
-	   						 	 		m[0].forEach(function(e){ //First element is the history, last 2 are timestamps
-	   						 	 			if(typeof e === 'object'){
-	   						 	 				var msg = e.message;
-	   						 	 				var tt = e.timetoken;
-	   						 	 				
-	   						 	 				UI.addChatMessage(msg.text,UI.formatTimeToken(tt),msg.from,msg.avatar);
-	   						 	 			}
-	   						 	 		})
-	   						 	 	}
-	   						 	 })
-
 
 	   						  },
 	   						  disconnect: function(res){
