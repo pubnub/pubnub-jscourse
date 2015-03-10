@@ -88,6 +88,7 @@
 							</ul>
 						</div>
 					</div>
+                    <!-- LAB2 CHANGE THE display:none to be display:block -->
 					<div class="row well" style="display:none;">
 						<div id="chat-control" class="col-sm-8">
 							<div class="message-console-send-area" class="col-sm-10">
@@ -128,7 +129,23 @@
 	   		var country = "United States";
 	   		var myState = {'username': username, 'avatar': avatarClassName, 'location': 'Uknown'};
 	   		
-	   		
+            //<!- INSERT LAB 3 G1 BELOW THIS LINE: https://gist.github.com/frederickbrock/d9b49576393afc87b5cf ->
+
+            var myUUID = localStorage.getItem(subkey + "uuid");
+            var lastTimeToken = localStorage.getItem(subkey);
+            console.log('local storage had: ' + myUUID + ' for uuid and ' + ' ' + lastTimeToken);
+            if(lastTimeToken === null){
+                console.log('not using last token');
+                lastTimeToken = 0; //make it zero
+            }
+            if(myUUID === null){
+                myUUID = PUBNUB.uuid();
+            }
+
+
+            //<!- INSERT LAB 1 G1 BELOW THIS LINE: https://gist.github.com/frederickbrock/cc817b213769d01b70aa ->
+            //<!- INSERT LAB 2 G1 BELOW THIS LINE: https://gist.github.com/frederickbrock/a9f83fa15bf6d9a861bc ->
+            //<!- INSERT LAN 3 G4 BELOW THIS LINE: https://gist.github.com/frederickbrock/88ce27b1c0e5b733c80c ->
 	   		
 
 
