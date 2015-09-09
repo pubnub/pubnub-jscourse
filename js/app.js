@@ -64,7 +64,7 @@ var UI = {
             userDiv = document.createElement("div");
         }
         userDiv.className = 'user-presence-container';
-        userDiv.innerHTML = '<div class="row"><div class="col-sm-2"><i class="' + userState.avatar + '"></i></div><div class="col-sm-8"><h4>' + userState.username + '</h4></div></div>';
+        userDiv.innerHTML = '<div class="row"><div class="col-sm-2"><i class="' + userState.avatar + '"></i></div><div class="col-sm-8"><h4>' + userState.firstName + " " + userState.lastName + '</h4></div></div>';
         if(userElement === null){
             li.appendChild(userDiv);
             li.setAttribute("class","list-group-item online");

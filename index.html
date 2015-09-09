@@ -19,26 +19,81 @@
     		<div class="modal-content">
       				<div class="modal-header">
         				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        				<h4 class="modal-title">Welcome, please let us know who you are:</h4>
+        				<h4 class="modal-title">Welcome, please log in or click on register</h4>
       				</div>
       				<div class="modal-body">
       				  <div class="row">
-      				  	<div class="col-sm-12">
+      				  	<div class="col-sm-12 form-group">
       				  		<label for="txtUsername">User Name:</label>
-        					<input type="text" id="txtUsername">
+        					<input type="text" id="username" class="form-control">
         			 	</div>
         			  </div>
         			  <div class="row">
-        			  	<div class="col-sm-12">
-        			  		<label for="txtLocation"><p>Where are you from:</p></label>
-        			  		<input type="text" id="txtLocation">
+        			  	<div class="col-sm-12 form-group">
+        			  		<label for="txtLocation"><p>Password</p></label>
+        			  		<input type="password" id="password" class="form-control">
         			  	</div>
         			  </div>
       				</div>
       				<div class="modal-footer">
-        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-update-profile">Save changes</button>
+        				<button type="button" class="btn btn-default" data-dismiss="modal" id="btn-register">Register</button>
+        				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-login">Login</button>
       				</div>
+      				
+    		</div><!-- /.modal-content -->	
+  		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<div class="modal fade" id="register-profile-modal">
+  		<div class="modal-dialog">
+    		<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        				<h4 class="modal-title">Create a new account</h4>
+      				</div>
+      				<div class="modal-body">
+      				  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">First Name: </label>
+        					<input type="text" class="form-control" id="firstname">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">Last Name: </label>
+        					<input type="text" class="form-control" id="lastname">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">Email: </label>
+        					<input type="text" class="form-control" id="emaila">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">username: </label>
+        					<input type="text" class="form-control" id="username">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">password: </label>
+        					<input type="password" class="form-control" id="password">
+        			 	</div>
+        			  </div>
+        			  <div class="row">
+      				  	<div class="col-sm-12 form-group">
+      				  		<label for="firstname">password (re-type): </label>
+        					<input type="password"  class="form-control" id="password">
+        			 	</div>
+        			  </div>
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-default" data-dismiss="modal" id="btn-save-register">Register</button>
+        				<button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-cancel">Cancel</button>
+      				</div>
+      			
     		</div><!-- /.modal-content -->	
   		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
@@ -56,8 +111,13 @@
 			<div class="row">
 				<div class="col-sm-12">
 					
-							<button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="settings-button" data-toggle="modal" data-target="#profile-modal">
-  								<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+							<button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="register-button" data-toggle="modal" data-target="#register-profile-modal">
+  								<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+							</button>
+
+
+							<button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="login-button" data-toggle="modal" data-target="#profile-modal">
+  								<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 							</button>
 					
 			   </div>
@@ -119,50 +179,30 @@
 	   (function(){
 
 	   		//Init & Subscribe
+	   		//var API_SERVER_BASE = "http://localhost:5000/chatterbox"
+	   		var API_SERVER_BASE = "http://agile-atoll-1850.herokuapp.com/chatterbox"
 	   		var chat_channel = "webinar-chat";
-	   		var subkey = "demo-36";
-	   		var pubkey = "demo-36";
+	   		var subkey = "sub-c-8bd55596-1f48-11e5-9205-0619f8945a4f";
+	   		var pubkey = "pub-c-27c05fcb-d215-4433-9b95-a6e3fd9f49d7";
 			var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
-	   		var username = "Unknown";
-	   		var city = "Portland";
-	   		var country = "United States";
-	   		var myState = {'username': username, 'avatar': avatarClassName, 'location': 'Uknown'};
+	   		var profile = null;
+	   		var pubnub = null;
+			var lastTimeToken = localStorage.getItem(subkey);
+
+	   		var initialize_pubnub = function(profile){
 	   		
-	   		if(localStorage.getItem('profileExists')){
-	   			//initalize the userState from localstorage..
-	   			//you could also retrieve a user profile from your backend systems
-	   			myState.username = localStorage.profileUserName;
-	   			myState.avatar   = localStorage.profileAvatarClassName;
-	   			myState.location = localStorage.profileLocation;
-	   		}
-
-	   		var myUUID = localStorage.getItem(subkey + "uuid");
-	   		var lastTimeToken = localStorage.getItem(subkey);
-
-	   		console.log('local storage had: ' + myUUID + ' for uuid and ' + ' ' + lastTimeToken);
-
-	   		if(lastTimeToken === null){
-	   			console.log('not using last token');
-	   			lastTimeToken = 0; //make it zero
-	   		}
-
-	   		if(myUUID === null){
-	   			myUUID = PUBNUB.uuid();
-	   		}
+	   			pubnub = PUBNUB.init({
+	   				subscribe_key: subkey,
+	   				publish_key: pubkey,
+	   				uuid: profile.username,
+	   				auth_key: profile._id
+	   				//ssl: true,
+	   				//windowing: 
+	   				//cipher_key: ''
+	   			});	
 
 
-	   		//LAB 1
-	   		var pubnub = PUBNUB.init({
-	   			subscribe_key: subkey,
-	   			publish_key: pubkey,
-	   			uuid: myUUID,
-	   			//ssl: true,
-	   			
-	   			//windowing: 
-	   		});
-
-
-	   		pubnub.subscribe({channel: chat_channel,
+	   			pubnub.subscribe({channel: chat_channel,
 	   						  restore: true, //attempt to restore missing messages on reconnect
 	   						  timetoken: lastTimeToken,
 	   						  connect: function(res){
@@ -214,7 +254,6 @@
 									UI.addChatMessage(messageText,formattedTime,fromUser,avatar);
 	   						  	  
 	   						  },
-	   						  state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
 	   						  presence: function(m){
 	   						  		//LAB3
 	   						  		if(m.action === "state-change"){
@@ -236,47 +275,108 @@
             							UI.updateRoomCount(m.action,m.occupancy); //Update the number of users present
             						}
 	   						  }
-	   		});
-			//LAB1
+	   				});
 
 
+					pubnub.state({	channel: chat_channel,
+	   							uuid:  profile.username,
+	   							state: profile });
+			}
+			
 
 			//update our state...this will trigger a state-change and should add the user to the occupants lists
 			//LAB2.1
-	   		function sendStateUpdate(){
-	   			var txtUserName    = document.querySelector('#txtUsername');
-	   			var txtLocation    = document.querySelector('#txtLocation');
-	   			
-	   			myState.username = txtUsername.value;
-	   			myState.location = txtLocation.value
-	   			
-	   			localStorage.setItem('profileUserName', txtUserName.value);
-	   			localStorage.setItem('profileLocation', txtLocation.value);
-	   			localStorage.setItem('profileAvatarClassName',avatarClassName);
-	   			localStorage.setItem('profileExists',true);
+	   		function login(){
+	   			var txtUserName    = document.querySelector('#username');
+	   			var txtPassword    = document.querySelector('#password');
+	   			var profile = null;
 
-	   			pubnub.state({	channel: chat_channel,
-	   							uuid:  myUUID,
-	   							state: myState });
+	   			console.log('username: ' + txtUserName.value + ' password: ' + txtPassword.value);
+
+	   			$.ajax({ url: API_SERVER_BASE + "/cbox/login"
+  						 ,data: JSON.stringify({"username": txtUserName.value, "password": txtPassword.value})
+  						 ,dataType: "json"
+  						 ,processData: false
+  						 ,type: "POST"
+  						 ,crossDomain: true
+  						 ,contentType: 'application/json'
+  						 ,error: function(r){
+  						 	console.log(r);
+  						 }
+
+						}).done(function(results) {
+  							console.dir(results);
+
+  							localStorage.setItem('profile',JSON.stringify(results));
+  							localStorage.setItem('profileUserName', results.username);
+	   						localStorage.setItem('profileLocation', results.location);
+	   						
+	   						localStorage.setItem('profileAvatarClassName',avatarClassName);
+	   						localStorage.setItem('profileExists',true);
+	   						initialize_pubnub(results);
+	   						logged_in = true;
+						});
 
 	   		}
 
-	   		var updateProfileButton = document.querySelector('#btn-update-profile');
-	   		updateProfileButton.onclick = sendStateUpdate;
+	   		function show_registration(){
+	   			$('#register-profile-modal').modal('show');
+	   		}
+
+	   		function save_registration(){
+	   			console.log('inside save registration');
+	   			var firstName   = document.querySelector('#firstname').value;
+	   			var lastName    = document.querySelector('#lastname').value;
+	   			var email       = document.querySelector('#emaila').value;
+	   			var username    = document.querySelector('#username').value;
+	   			var password    = document.querySelector('#password').value
+
+	   			
+	   			var newProfile = {"firstName": firstName
+	   							 ,"lastName": lastName
+	   							 ,"email": "dummy@email.com"
+	   							 ,"password": password
+	   							 ,"username": username
+	   							 ,"location": 'unused'
+	   							 ,"level": 'gold'};
+
+	   			console.log('sending profile: ' + JSON.stringify(newProfile));
 
 
-			if(myState.username === 'Unknown'){
-				//userhas not set his state.
-				$('#profile-modal').modal('show');
-			}else{
-				var txtUserName    = document.querySelector('#txtUsername');
-	   			var txtLocation    = document.querySelector('#txtLocation');
-	   			txtUsername.value = myState.username;
-	   			txtLocation.value = myState.location;
-	   			pubnub.state({	channel: chat_channel,
-	   							uuid:  myUUID,
-	   							state: myState });
-			}
+	   			$.ajax({ url: API_SERVER_BASE + "/api/v1/cbox/profile"
+  						 ,data: JSON.stringify(newProfile)
+  						 ,dataType: "json"
+  						 ,processData: false
+  						 ,type: "POST"
+  						 ,crossDomain: true
+  						 ,contentType: 'application/json'
+  						 ,error: function(r){
+  						 	console.log(r);
+  						 }
+
+						}).done(function(results) {
+  							console.dir(results);
+
+  							localStorage.setItem('profile',JSON.stringify(results));
+  							localStorage.setItem('profileUserName', results.username);
+	   						localStorage.setItem('profileLocation', results.location);
+	   						
+	   						localStorage.setItem('profileAvatarClassName',avatarClassName);
+	   						localStorage.setItem('profileExists',true);
+	   						initialize_pubnub(results);
+	   						logged_in = true;
+						});
+
+	   		}
+
+	   		
+	   		var login_button = document.querySelector('#btn-login');
+	   		var register_button = document.querySelector("#btn-register");
+	   		var save_registration_button = document.querySelector('#btn-save-registration');
+	   		
+	   		login_button.onclick = login;
+	   		register_button.onclick = show_registration;
+	   		save_registration_button = save_registration;
 
 			
 		
@@ -287,7 +387,9 @@
 			function publish() {
 				//#LAB3
 				var messageText = document.querySelector("#console-message-input");
-				var message = {from: myState.username, avatar: myState.avatar, text: messageText.value}; //You can add any attributes you want
+				var profileUserName = localStorage.getItem('profileUserName');
+				var profileAvatar = localStorage.getItem('profileAvatarClassName');
+				var message = {from: profileUserName, avatar: profileAvatar, text: messageText.value}; //You can add any attributes you want
 
         		pubnub.publish({
             				channel : chat_channel, 
@@ -298,7 +400,6 @@
             				error: function(err){
             					  console.log('an error has occurred while publishing the message');
             				}
-
         				});
 
         		messageText.value = ' ';
@@ -308,7 +409,25 @@
 	   		var messageSend = document.querySelector("#send-button");
 	   		messageSend.onclick = publish;
 
+	   		//see if this user is already logged in
+	   		if(localStorage.getItem('profile')){
+	   			var profileStr = localStorage.getItem('profile');
+	   			profile = JSON.parse(profileStr);
+	   			initialize_pubnub(profile);
+	   			
+	   			console.log('attempting to hide buttons');
+	   			$('#login-button').hide();
+	   			$('#register-button').hide();
+	   		}else{
+	   			$('#profile-modal').modal('show');
+			}
 	   		
+	   		
+	   		lastTimeToken = localStorage.getItem(subkey);
+	   		if(lastTimeToken === null){
+	   			console.log('not using last token');
+	   			lastTimeToken = 0; //make it zero
+	   		}
 
 
 	   })()
