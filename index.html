@@ -177,10 +177,9 @@
 	<script src="js/app.js"></script>
 	<script>
 	   (function(){
-
 	   		//Init & Subscribe
-	   		//var API_SERVER_BASE = "http://localhost:5000/chatterbox"
-	   		var API_SERVER_BASE = "http://agile-atoll-1850.herokuapp.com/chatterbox"
+	   		var API_SERVER_BASE = "http://localhost:5000/chatterbox"
+	   		//var API_SERVER_BASE = "http://agile-atoll-1850.herokuapp.com/chatterbox"
 	   		var chat_channel = "webinar-chat";
 	   		var subkey = "sub-c-8bd55596-1f48-11e5-9205-0619f8945a4f";
 	   		var pubkey = "pub-c-27c05fcb-d215-4433-9b95-a6e3fd9f49d7";
@@ -219,7 +218,6 @@
 	   						 	 			if(typeof e === 'object'){
 	   						 	 				var msg = e.message;
 	   						 	 				var tt = e.timetoken;
-	   						 	 				
 	   						 	 				UI.addChatMessage(msg.text,UI.formatTimeToken(tt),msg.from,msg.avatar);
 	   						 	 			}
 	   						 	 		})
@@ -414,7 +412,7 @@
 	   			var profileStr = localStorage.getItem('profile');
 	   			profile = JSON.parse(profileStr);
 	   			initialize_pubnub(profile);
-	   			
+
 	   			console.log('attempting to hide buttons');
 	   			$('#login-button').hide();
 	   			$('#register-button').hide();
