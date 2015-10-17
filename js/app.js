@@ -32,7 +32,7 @@ var UI = {
     'updateRoomCount' : function(paction, occupancy){
             var presence = document.querySelector("#presence");
             if(occupancy > 1) {
-                presence.innerHTML = '<span class="badge">' + occupancy + '</span>' + ' others online';
+                presence.innerHTML = '<span class="badge">' + occupancy + '</span>' + ' users online';
             } else {
                 presence.innerHTML = 'Nobody else is online';
             }
