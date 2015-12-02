@@ -11,6 +11,6 @@ Very simple Chat implementation used for the Javascript Intro webinar.  The appl
 [PubNub Javascript SDK Documentation] (http://www.pubnub.com/docs/javascript/javascript-sdk.html)
 
 
-A live version of this application is deployed, and can be accessed at: 
+### You can launch the app here:
 
 [Launch](http://pubnub.github.io/pubnub-jscourse/)
