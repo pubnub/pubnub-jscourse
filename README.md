@@ -12,4 +12,4 @@ running locally:
 
 A live version of this application is deployed, and can be accessed at: 
 
-[Simple Chat] http://pubnub.github.io/pubnub-jscourse/
+[Launch]: http://pubnub.github.io/pubnub-jscourse/
