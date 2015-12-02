@@ -6,9 +6,9 @@ Very simple Chat implementation used for the Javascript Intro webinar.  The appl
 * from the directory you cloned the repository in use the python SimpleHTTPServer 
  > python -m SimpleHTTPServer .
 
-## Official PubNub documentation for the PubNub javascript SDK can be found at the link below:
+##Javascript SDK documentation can be found at the link below:
 
-[pubnub] (http://www.pubnub.com/docs/javascript/javascript-sdk.html)
+[PubNub Javascript SDK Documentation] (http://www.pubnub.com/docs/javascript/javascript-sdk.html)
 
 
 A live version of this application is deployed, and can be accessed at: 
