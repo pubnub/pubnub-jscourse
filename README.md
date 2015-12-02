@@ -7,9 +7,9 @@ running locally:
  > python -m SimpleHTTPServer .
 
 
-
-
-
-
 [pubnub]: http://www.pubnub.com/docs/javascript/javascript-sdk.html
 
+
+A live version of this application is deployed, and can be accessed at: 
+
+[Simple Chat] http://pubnub.github.io/pubnub-jscourse/
