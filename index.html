@@ -101,7 +101,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.js"></script>
-    <script src="http://cdn.pubnub.com/pubnub-dev.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.0.0.js"></script>
     <script src="js/app.js"></script>
     <script>
         (function() {
@@ -143,94 +143,107 @@
                 myUUID = PUBNUB.uuid();
             }
 
-            //LAB 1
-            var pubnub = PUBNUB.init({
-                subscribe_key: subkey,
-                publish_key  : pubkey,
-                uuid         : myUUID,
-                //ssl: true,
+            var pubnub = new PubNub({
+                subscribeKey: pubkkey,
+                publishKey:   subkey,
+                logVerbosity: true,
+                uuid:         myUUID,
+                ssl:          true
             });
 
-            pubnub.subscribe({
-                channel: chat_channel,
-                restore: true, //attempt to restore missing messages on reconnect
-                timetoken: lastTimeToken,
-                connect: function(res) {
-                    console.log('connected');
-
-                    pubnub.history({
-                        channel: chat_channel,
-                        end: lastTimeToken,
-                        count: 50,
-                        include_token: true,
-                        callback: function(m) {
-                            console.log('got history:');
-                            m[0].forEach(function(e) { //First element is the history, last 2 are timestamps
-                                if (typeof e === 'object') {
-                                    var msg = e.message;
-                                    var tt = e.timetoken;
-                                    UI.addChatMessage(msg.text, UI.formatTimeToken(tt), msg.from, msg.avatar);
-                                }
-                            })
-                        }
-                    })
-                },
-                disconnect: function(res) {
-                    //called when pubnub sdk is disconnected from the pubnub 
-                    console.log('disconnect called');
-                },
-
-                reconnect: function(res) {
-                    console.log('reconnecting to pubnub');
-                },
-
-                message: function(message, envelope, channel) {
-                    //LAB#1
-                    /* called when a message arrives
-                     * parameters are:
-                     * channel: the name of the channel the message arrived on
-                     * envelope: the complete envelope which contains an tuple of {channel_name, message,timetoken}
-                     * message: the message
-                     */
-                    var timeToken = envelope[1];
+            pubnub.addListener({
+                message: function(message) {
+                    // message.p is the publish info
+                    var timeToken = message.p.t; // publish timetoken
                     var formattedTime = UI.formatTimeToken(timeToken);
-                    var messageText = message.text;
-                    var fromUser = message.from;
-                    var avatar = message.avatar;
-                    UI.addChatMessage(messageText, formattedTime, fromUser, avatar);
+                    
+                    // message.d is the message payload
+                    var messageText = message.d.text;
+                    var fromUser = message.d.from;
+                    var avatar = message.d.avatar;
 
+                    UI.addChatMessage(messageText, formattedTime, fromUser, avatar);
                 },
-                state: myState, //will be sent when you subscribe. This is a good place to map useraccounts etc
-                presence: function(m) {
-                    //LAB3
-                    if (m.action === "state-change") {
-                        console.log('state-change event: ');
-                        UI.handleStateChange(m.action, m.uuid, m.data);
+
+                presence: function(event) {
+                    var action = event.action;
+                    var uuid = event.uuid;
+                    var data = event.data;
+                    var occupancy = event.occupancy;
+
+                    if (action === "state-change") {
+                        UI.handleStateChange(action, uuid, data);
                     } 
-                    else if (m.action === "join") {
-                        console.log('join event');
+                    else if (action === "join") {
                         //get the state of the user
-                        pubnub.state({
-                            channel: chat_channel,
-                            uuid: m.uuid,
-                            callback: function(s) {
-                                UI.handleStateChange('state-change', m.uuid, s);
+                        pubnub.getState(
+                            {
+                                channel: chat_channel,
+                                uuid: uuid
+                            },
+                            function(response) {
+                                UI.handleStateChange('state-change', uuid, response);
                             }
                         });
 
-                        UI.updateRoomCount(m.action, m.occupancy);
+                        UI.updateRoomCount(action, occupancy);
                     } 
-                    else if ((m.action === "timeout") || (m.action === "leave")) {
-                        console.log('timeout or leave event, remove the user element');
-                        UI.handleLeaveEvent(m.action, m.uuid); //Remove the user from the list of participants
-                        UI.updateRoomCount(m.action, m.occupancy); //Update the number of users present
+                    else if ((action === "timeout") || (action === "leave")) {
+                        UI.handleLeaveEvent(action, uuid); 
+                        UI.updateRoomCount(action, occupancy);
                     }
-                }
-            });
-            //LAB1
+                },
 
-            //update our state...this will trigger a state-change and should add the user to the occupants lists
-            //LAB2.1
+                status: function(event) {
+                    if (event.category === "PNConnectedCategory") {
+                        pubnub.hereNow(
+                            {
+                                channels: [chat_channel]
+                                includeUUIDs: true,
+                                includeState: true
+                            }, 
+                            function (response) {
+                                sendStateUpdate();
+
+                                response[uuids].forEach(
+                                    function(item) {
+                                        if (typeof item === 'object') {
+                                            UI.handleStateChange('state-change', item.uuid, item.state);
+                                        }
+                                    }
+                                );
+                            }
+                        );
+
+                        pubnub.history(
+                            {
+                                channel: chat_channel,
+                                end: lastTimeToken,
+                                includeTimetoken: true
+                            },
+                            function (status, response) {
+                                response[0].forEach(
+                                    function(e) {
+                                        if (typeof e === 'object') {
+                                            UI.addChatMessage(
+                                                e.message.text, 
+                                                UI.formatTimeToken(e.timetoken), 
+                                                e.message.from, e.message.avatar
+                                            );
+                                        }
+                                    }
+                                );
+                            }
+                        );
+                    }
+                },
+            });
+
+            pubnub.subscribe({
+                channels: [chat_channel],
+                withPresence: true // also subscribe to presence instances.
+            });
+
             function sendStateUpdate() {
                 var txtUserName = document.querySelector('#txtUsername');
                 var txtLocation = document.querySelector('#txtLocation');
@@ -243,18 +256,23 @@
                 localStorage.setItem('profileAvatarClassName', avatarClassName);
                 localStorage.setItem('profileExists', true);
 
-                pubnub.state({
-                    channel: chat_channel,
-                    uuid: myUUID,
-                    state: myState
-                });
+                pubnub.setState(
+                    {
+                        channels: [chat_channel],
+                        uuid: myUUID,
+                        state: myState
+                    },
+                    function(response) {
+
+                    }
+                );
             }
 
             var updateProfileButton = document.querySelector('#btn-update-profile');
             updateProfileButton.onclick = sendStateUpdate;
 
             if (myState.username === 'Unknown') {
-                //userhas not set his state.
+                // userhas not set his state.
                 $('#profile-modal').modal('show');
             } 
             else {
@@ -262,11 +280,17 @@
                 var txtLocation = document.querySelector('#txtLocation');
                 txtUsername.value = myState.username;
                 txtLocation.value = myState.location;
-                pubnub.state({
-                    channel: chat_channel,
-                    uuid: myUUID,
-                    state: myState
-                });
+
+                pubnub.state(
+                    {
+                        channels: [chat_channel],
+                        uuid: myUUID,
+                        state: myState
+                    },
+                    function(response) {
+                            
+                    }
+                );
             }
 
             /** 
@@ -274,26 +298,29 @@
              * the message
              **/
             function publish() {
-                //#LAB3
                 var messageText = document.querySelector("#console-message-input");
-                var message = {
+                var msg = {
                     from: myState.username,
                     avatar: myState.avatar,
                     text: messageText.value
-                }; //You can add any attributes you want
+                };
 
-                pubnub.publish({
-                    channel: chat_channel,
-                    message: message,
-                    success: function(res) {
-                        console.log('this callback willl be called when the message is sent');
-                    },
-                    error: function(err) {
-                        console.log('an error has occurred while publishing the message');
+                pubnub.publish(
+                    {
+                        message: msg,
+                        channel: chat_channel
+                    }, 
+                    function (status, response) {
+                        if (status.error) {
+                            console.log(status)
+                        } 
+                        else {
+                            console.log("message Published w/ timetoken", response.timetoken)
+                        }
                     }
-                });
+                );
 
-                messageText.value = ' ';
+                messageText.value = '';
             }
 
             //reference to the send button element
