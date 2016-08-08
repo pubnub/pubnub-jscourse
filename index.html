@@ -101,14 +101,14 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.js"></script>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.0.0.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.0.3.js"></script>
     <script src="js/app.js"></script>
     <script>
         (function() {
             //Init & Subscribe
             var chat_channel = "webinar-chat";
-            var subkey = "demo-36";
             var pubkey = "demo-36";
+            var subkey = "demo-36";
             var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
 
             var username = "Unknown";
@@ -144,25 +144,25 @@
             }
 
             var pubnub = new PubNub({
-                subscribeKey: pubkkey,
+                subscribeKey: pubkey,
                 publishKey:   subkey,
                 logVerbosity: true,
                 uuid:         myUUID,
-                ssl:          true
+                ssl:          true,
+                heartbeatInterval: 20 // this is too low, but is for demo timeout
             });
 
             pubnub.addListener({
-                message: function(message) {
+                message: function(response) {
                     // message.p is the publish info
-                    var timeToken = message.p.t; // publish timetoken
-                    var formattedTime = UI.formatTimeToken(timeToken);
+                    var formattedTime = UI.formatTimeToken(response.timetoken);
                     
                     // message.d is the message payload
-                    var messageText = message.d.text;
-                    var fromUser = message.d.from;
-                    var avatar = message.d.avatar;
+                    var text = response.message.text;
+                    var fromUser = response.message.from;
+                    var avatar = response.message.avatar;
 
-                    UI.addChatMessage(messageText, formattedTime, fromUser, avatar);
+                    UI.addChatMessage(text, formattedTime, fromUser, avatar);
                 },
 
                 presence: function(event) {
@@ -184,7 +184,7 @@
                             function(response) {
                                 UI.handleStateChange('state-change', uuid, response);
                             }
-                        });
+                        );
 
                         UI.updateRoomCount(action, occupancy);
                     } 
@@ -198,18 +198,18 @@
                     if (event.category === "PNConnectedCategory") {
                         pubnub.hereNow(
                             {
-                                channels: [chat_channel]
+                                channels: [chat_channel],
                                 includeUUIDs: true,
                                 includeState: true
                             }, 
-                            function (response) {
+                            function (status, response) {
                                 sendStateUpdate();
 
-                                response[uuids].forEach(
+                                // only one channel for this app, so we don't need to iterate over channels
+                                // get the channel by name and then get the uuids and state for each occupant
+                                response['channels'][chat_channel]['occupants'].forEach(
                                     function(item) {
-                                        if (typeof item === 'object') {
-                                            UI.handleStateChange('state-change', item.uuid, item.state);
-                                        }
+                                        UI.handleStateChange('state-change', item.uuid, item.state);
                                     }
                                 );
                             }
@@ -222,15 +222,13 @@
                                 includeTimetoken: true
                             },
                             function (status, response) {
-                                response[0].forEach(
-                                    function(e) {
-                                        if (typeof e === 'object') {
-                                            UI.addChatMessage(
-                                                e.message.text, 
-                                                UI.formatTimeToken(e.timetoken), 
-                                                e.message.from, e.message.avatar
-                                            );
-                                        }
+                                response['messages'].forEach(
+                                    function(msg) {
+                                        UI.addChatMessage(
+                                            msg.entry.text, 
+                                            UI.formatTimeToken(msg.timetoken), 
+                                            msg.entry.from, msg.entry.avatar
+                                        );
                                     }
                                 );
                             }
@@ -281,7 +279,7 @@
                 txtUsername.value = myState.username;
                 txtLocation.value = myState.location;
 
-                pubnub.state(
+                pubnub.setState(
                     {
                         channels: [chat_channel],
                         uuid: myUUID,
