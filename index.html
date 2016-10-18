@@ -105,6 +105,13 @@
     <script src="js/app.js"></script>
     <script>
         (function() {
+            // bind the Enter key to send-button click event
+            $(document).keypress(function(e){
+                if (e.which == 13){
+                    $("#send-button").click();
+                }
+            });
+
             //Init & Subscribe
             var chat_channel = "webinar-chat";
             var pubkey = "demo-36"; // use your own pub-key
