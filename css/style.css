@@ -55,6 +55,15 @@ h1 {
     left: 34px;
 }
 
+.anonymous {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+  background-image: url(images/anonymous.png);
+  position: relative;
+}
+
 .chat-message-avatar {
   background-repeat: no-repeat;
   background-size: cover;

@@ -2,26 +2,33 @@
 
 var UI = {
 
-    'formatTimeToken': function(timeToken){
+    'formatTimeToken': function(timeToken) {
             var date = new Date(timeToken/10000);
+            var month = date.getMonth()+1;
+            var day = date.getDate();
+            var year = date.getFullYear();
             var hours = date.getHours();
             var minutes = "0" + date.getMinutes();
             var seconds = "0" + date.getSeconds();
+            
+            var formattedTime = 
+                year + '-' + month + '-' + day + " " + 
+                hours + ':' + 
+                minutes.substr(minutes.length-2) + ':' + 
 
-                                    // will display time in 10:30:23 format
-            var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);    
+                seconds.substr(seconds.length-2);
             return formattedTime;
                                 
     },
 
-    'handleLeaveEvent' : function(paction, uuid){
-
+    'handleLeaveEvent' : function(paction, uuid) {
         var userlist = document.querySelector("#userl");
             console.log('received a leave or timeout event');
-            if(userlist.children){
-                for(var x=0; x < userlist.children.length; ++x){
+
+            if (userlist.children) {
+                for (var x=0; x < userlist.children.length; ++x) {
                     var e = userlist.children[x];
-                    if(e.getAttribute('data-uuid') === uuid){
+                    if (e.getAttribute('data-uuid') === uuid) {
                         //remove the user that is no longer online
                         userlist.removeChild(e);
                     }
@@ -29,24 +36,26 @@ var UI = {
             }
     },
 
-    'updateRoomCount' : function(paction, occupancy){
+    'updateRoomCount' : function(paction, occupancy) {
             var presence = document.querySelector("#presence");
-            if(occupancy > 1) {
-                presence.innerHTML = '<span class="badge">' + occupancy + '</span>' + ' others online';
-            } else {
+
+            if (occupancy > 1) {
+                presence.innerHTML = '<span class="badge">' + occupancy - 1 + '</span>' + ' others online';
+            } 
+            else {
                 presence.innerHTML = 'Nobody else is online';
             }
     },
 
-    'handleStateChange': function(paction, uuid, userState){
+    'handleStateChange': function(paction, uuid, userState) {
 
          var userlist = document.querySelector("#userl");
          var userElement = null;
         
-         if(userlist.children !== 'undefined'){
-             for(var x=0;x < userlist.children.length; ++x){
+         if (userlist.children !== 'undefined') {
+             for (var x=0; x < userlist.children.length; ++x) {
                     var e = userlist.children[x];
-                    if(e.getAttribute("data-uuid") === uuid){
+                    if (e.getAttribute("data-uuid") === uuid) {
                         userElement = e;
                         break;
                     }
@@ -55,17 +64,29 @@ var UI = {
 
         var userDiv = null;
         var li = null;
-        if(userElement != null){
+
+        if (userElement != null) {
             console.log('found existing element');
             userDiv = userElement.firstChild;
             li = userElement;
-        }else{
+        }
+        else {
             li = document.createElement('li');
             userDiv = document.createElement("div");
         }
+
         userDiv.className = 'user-presence-container';
-        userDiv.innerHTML = '<div class="row"><div class="col-sm-2"><i class="' + userState.avatar + '"></i></div><div class="col-sm-8"><h4>' + userState.username + '</h4></div></div>';
-        if(userElement === null){
+        if (userState == undefined) {
+            userState = {};
+            userState.avatar = "";
+            userState.username = "anonymous";
+        }
+        
+        userDiv.innerHTML = '<div class="row"><div class="col-sm-2"><i class="' + userState.avatar 
+            + '"></i></div><div class="col-sm-8"><h4>' + userState.username + 
+            '</h4></div></div> <div class="row"><div class="col-sm-8" align="center">' + userState.location + '</div></div>';
+
+        if (userElement === null) {
             li.appendChild(userDiv);
             li.setAttribute("class","list-group-item online");
             li.setAttribute("data-uuid",uuid);
@@ -73,7 +94,8 @@ var UI = {
         }
     },
 
-    'addChatMessage' : function(messageText, timeStamp, fromUser, avatar){
+    'addChatMessage' : function(messageText, timeStamp, fromUser, avatar) {
+        if (!messageText) return; // someone sent data outside of the UI (using REST for example) so ignore it
         var nPanel = document.createElement("div");
         nPanel.className = "panel panel-default";
         
