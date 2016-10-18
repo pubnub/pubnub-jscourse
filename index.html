@@ -101,7 +101,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.js"></script>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.1.0.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.1.1.js"></script>
     <script src="js/app.js"></script>
     <script>
         (function() {
@@ -160,12 +160,12 @@
             });
 
             pubnub.addListener({
-                message: function(response) {
-                    lastTimeToken = response.timetoken;
+                message: function(event) {
+                    lastTimeToken = event.timetoken;
                     var formattedTime = UI.formatTimeToken(lastTimeToken);
-                    var text = response.message.text;
-                    var fromUser = response.message.from;
-                    var avatar = response.message.avatar;
+                    var text = event.message.text;
+                    var fromUser = event.message.from;
+                    var avatar = event.message.avatar;
 
                     UI.addChatMessage(text, formattedTime, fromUser, avatar);
                 },
