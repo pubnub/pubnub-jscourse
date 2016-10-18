@@ -51,6 +51,12 @@
                 <div class="col-lg-12 well well-lg" style="background-color: #708090">
                     <div class="row">
                         <div class="col-sm-12">
+                            <button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="join-button">
+                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="leave-button">
+                                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                            </button>
                             <button type="button" class="btn btn-default btn-sm" style="position: relative; top: -5px;left:12px; float:right" id="settings-button" data-toggle="modal" data-target="#profile-modal">
                                 <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                             </button>
@@ -113,14 +119,14 @@
             });
 
             //Init & Subscribe
-            var chat_channel = "webinar-chat";
+            var chat_channel = "webinar-chat1";
             var pubkey = "demo-36"; // use your own pub-key
             var subkey = "demo-36"; // use your own sub-key
             var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
 
             var username = "Unknown";
-            var city = "Anywhere";
-            var country = "In the world";
+            var city = "Unknown";
+            var country = "USA";
 
             var myState = {
                 'username': username,
@@ -153,10 +159,10 @@
             var pubnub = new PubNub({
                 subscribeKey: pubkey,
                 publishKey:   subkey,
-                logVerbosity: true,
+                logVerbosity: false,
                 uuid:         myUUID,
                 ssl:          true,
-                heartbeatInterval: 60 // this is too low, but is for demo timeout
+                heartbeatInterval: 60
             });
 
             pubnub.addListener({
@@ -172,11 +178,23 @@
 
                 presence: function(event) {
                     var action = event.action;
+                    var channel = event.channel;
                     var uuid = event.uuid;
                     var data = event.state;
                     var occupancy = event.occupancy;
 
+                    console.log("");
+                    console.log("*** presence event ***");
+                    console.log("action:    " + action);
+                    console.log("channel:   " + channel);
+                    console.log("uuid:      " + uuid);
+                    console.log("occupancy: " + occupancy);
+                    console.log("data:      " + JSON.stringify(data));
+                    console.log("*** presence event ***");
+                    console.log("");
+
                     if (action === "state-change") {
+                        console.log("!!!@@@ state-change event @@@!!!");
                         UI.handleStateChange(action, uuid, data);
                     } 
                     else if (action === "join") {
@@ -186,7 +204,10 @@
                                 channel: chat_channel,
                                 uuid: uuid
                             },
-                            function(response) {
+                            function(status, response) {
+                                console.log("!!! getState on join event !!!");
+                                console.log("!!! getState status: " + JSON.stringify(status));
+                                console.log("!!! getState response: " + JSON.stringify(response));    
                                 UI.handleStateChange('state-change', uuid, response);
                             }
                         );
@@ -214,7 +235,8 @@
                                 // get the channel by name and then get the uuids and state for each occupant
                                 response['channels'][chat_channel]['occupants'].forEach(
                                     function(item) {
-                                        UI.handleStateChange('state-change', item.uuid, item.state);
+                                        if (item.state)
+                                            UI.handleStateChange('state-change', item.uuid, item.state);
                                     }
                                 );
                             }
@@ -243,13 +265,33 @@
                             }
                         );
                     }
+                    else if (event.category === "PNUnsubscribeOperation") {
+                        UI.handleLeaveEvent("leave", myUUID);
+                    }
+
                 },
             });
+
 
             pubnub.subscribe({
                 channels: [chat_channel],
                 withPresence: true // also subscribe to presence instances.
             });
+
+            function joinChatRoom() {
+                // if (chat_channel != "webinar-chat") debugger;
+                console.log("!!!! CHAT_CHANNEL: " + chat_channel);
+                pubnub.subscribe({
+                    channels: [chat_channel],
+                    withPresence: true // also subscribe to presence instances.
+                });
+            }
+
+            function leaveChatRoom() {
+                pubnub.unsubscribe({
+                    channels: [chat_channel]
+                });
+            }
 
             function sendStateUpdate() {
                 var txtUserName = document.querySelector('#txtUsername');
@@ -270,7 +312,7 @@
                         state: myState
                     },
                     function(response) {
-
+                        console.log("setState on sendStateUpdate: " + JSON.stringify(response));
                     }
                 );
             }
@@ -278,7 +320,7 @@
             var updateProfileButton = document.querySelector('#btn-update-profile');
             updateProfileButton.onclick = sendStateUpdate;
 
-            if (myState.username === 'Unknown') {
+            if (myState.username === 'Unknow') {
                 // userhas not set his state.
                 $('#profile-modal').modal('show');
             } 
@@ -295,10 +337,12 @@
                         state: myState
                     },
                     function(response) {
-                            
+                        console.log("setState before joinChatRoom: " + JSON.stringify(response));
+                        joinChatRoom();
                     }
                 );
             }
+
 
             /** 
              * this function publishes the text in the input text to pubnub, anyone subscribed to the channel will recieve 
@@ -333,6 +377,12 @@
             //reference to the send button element
             var messageSend = document.querySelector("#send-button");
             messageSend.onclick = publish;
+            
+            joinButton = document.querySelector('#join-button');
+            joinButton.onclick = joinChatRoom;
+
+            leaveButton = document.querySelector('#leave-button');
+            leaveButton.onclick = leaveChatRoom;
         })()
     </script>
 </body>

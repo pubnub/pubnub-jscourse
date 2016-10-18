@@ -23,7 +23,7 @@ var UI = {
 
     'handleLeaveEvent' : function(paction, uuid) {
         var userlist = document.querySelector("#userl");
-            console.log('received a leave or timeout event');
+            console.log('received a ' + paction + ' event');
 
             if (userlist.children) {
                 for (var x=0; x < userlist.children.length; ++x) {
