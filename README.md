@@ -1,12 +1,16 @@
-# Super Simple Chat Demo
+Very simple Chat implementation used for the Javascript Intro webinar.  The application consist of two main files, index.html for UI and Pubnub API and app.js that only updates the UI. It depends on Jquery and Bootstrap for UI elements only. 
+
+## Running locally: 
+
+* clone the repository
+* from the directory you cloned the repository in use the python SimpleHTTPServer 
+ > python -m SimpleHTTPServer .
+
+##Javascript SDK documentation can be found at the link below:
+
+[PubNub Javascript SDK Documentation] (https://www.pubnub.com/docs/javascript/pubnub-javascript-sdk-v4)
 
 
-A simple chat room demo for a tutorial of [PhoneGap][pg] and [PubNub][pubnub] data stream JavaScript API.
+### You can launch the app here:
 
-
-[Demo](http://pubnub.github.io/super-simple-chat/index.html)
-
-
-[pg]: http://phonegap.com
-[pubnub]: http://www.pubnub.com/docs/javascript/javascript-sdk.html
-
+[Launch](http://pubnub.github.io/pubnub-jscourse/)
