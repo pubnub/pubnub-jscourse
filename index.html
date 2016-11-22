@@ -88,8 +88,8 @@
                             <div class="row well">
                                 <div id="chat-control" class="col-sm-8">
                                     <div class="message-console-send-area" class="col-sm-10">
-                                        <label class="message-console-textarea-title" for="message-console-input">message</label>
-                                        <textarea class="console-message" id="console-message-input" placeholder="Your message....."></textarea>
+                                        <label class="message-console-textarea-title" for="message-console-input"></label>
+                                        <textarea class="console-message" id="console-message-input" placeholder="Enter message..."></textarea>
                                     </div>
                                     <div class="col-sm-4">
                                         <button type="button" class="btn btn-default btn-lg" id="send-button">
@@ -122,7 +122,6 @@
             var chat_channel = "webinar-chat1";
             var pubkey = "demo-36"; // use your own pub-key
             var subkey = "demo-36"; // use your own sub-key
-            var avatarClassName = 'face-' + ((Math.random() * 13 + 1) >>> 0) + ' color-' + ((Math.random() * 10 + 1) >>> 0);
 
             var username = "Unknown";
             var city = "Unknown";
@@ -130,7 +129,6 @@
 
             var myState = {
                 'username': username,
-                'avatar': avatarClassName,
                 'location': 'Uknown'
             };
 
@@ -138,7 +136,6 @@
                 //initalize the userState from localstorage..
                 //you could also retrieve a user profile from your backend systems
                 myState.username = localStorage.profileUserName;
-                myState.avatar = localStorage.profileAvatarClassName;
                 myState.location = localStorage.profileLocation;
             }
 
@@ -171,9 +168,8 @@
                     var formattedTime = UI.formatTimeToken(lastTimeToken);
                     var text = event.message.text;
                     var fromUser = event.message.from;
-                    var avatar = event.message.avatar;
 
-                    UI.addChatMessage(text, formattedTime, fromUser, avatar);
+                    UI.addChatMessage(text, formattedTime, fromUser);
                 },
 
                 presence: function(event) {
@@ -193,31 +189,17 @@
                     console.log("*** presence event ***");
                     console.log("");
 
-                    if (action === "state-change") {
-                        console.log("!!!@@@ state-change event @@@!!!");
-                        UI.handleStateChange(action, uuid, data);
-                    } 
-                    else if (action === "join") {
-                        //get the state of the user
-                        pubnub.getState(
-                            {
-                                channel: chat_channel,
-                                uuid: uuid
-                            },
-                            function(status, response) {
-                                console.log("!!! getState on join event !!!");
-                                console.log("!!! getState status: " + JSON.stringify(status));
-                                console.log("!!! getState response: " + JSON.stringify(response));    
-                                UI.handleStateChange('state-change', uuid, response);
-                            }
-                        );
-
-                        UI.updateRoomCount(action, occupancy);
+                    if (action === "join") {
+                        UI.updateRoomCount(occupancy);
                     } 
                     else if ((action === "timeout") || (action === "leave")) {
-                        UI.handleLeaveEvent(action, uuid); 
-                        UI.updateRoomCount(action, occupancy);
+                        UI.handleLeaveEvent(event); 
                     }
+                    else if (action === "state-change") {
+                        console.log("!!!@@@ state-change event @@@!!!");
+                        UI.handleStateChange(event.uuid, event.state);
+                    } 
+
                 },
 
                 status: function(event) {
@@ -233,10 +215,11 @@
 
                                 // only one channel for this app, so we don't need to iterate over channels
                                 // get the channel by name and then get the uuids and state for each occupant
-                                response['channels'][chat_channel]['occupants'].forEach(
+                                UI.updateRoomCount(response.channels[chat_channel].occupancy);
+                                response.channels[chat_channel].occupants.forEach(
                                     function(item) {
                                         if (item.state)
-                                            UI.handleStateChange('state-change', item.uuid, item.state);
+                                            UI.handleStateChange(item.uuid, item.state);
                                     }
                                 );
                             }
@@ -258,17 +241,13 @@
                                         UI.addChatMessage(
                                             msg.entry.text, 
                                             UI.formatTimeToken(msg.timetoken), 
-                                            msg.entry.from, msg.entry.avatar
+                                            msg.entry.from
                                         );
                                     }
                                 );
                             }
                         );
                     }
-                    else if (event.category === "PNUnsubscribeOperation") {
-                        UI.handleLeaveEvent("leave", myUUID);
-                    }
-
                 },
             });
 
@@ -285,12 +264,19 @@
                     channels: [chat_channel],
                     withPresence: true // also subscribe to presence instances.
                 });
+
+                document.querySelector("#send-button").disabled = false;
+                document.querySelector("#console-message-input").disabled = false;
             }
 
             function leaveChatRoom() {
                 pubnub.unsubscribe({
                     channels: [chat_channel]
                 });
+
+                UI.clearBuddyList();
+                document.querySelector("#send-button").disabled = true;
+                document.querySelector("#console-message-input").disabled = true;
             }
 
             function sendStateUpdate() {
@@ -302,7 +288,6 @@
 
                 localStorage.setItem('profileUserName', txtUserName.value);
                 localStorage.setItem('profileLocation', txtLocation.value);
-                localStorage.setItem('profileAvatarClassName', avatarClassName);
                 localStorage.setItem('profileExists', true);
 
                 pubnub.setState(
@@ -352,7 +337,6 @@
                 var messageText = document.querySelector("#console-message-input");
                 var msg = {
                     from: myState.username,
-                    avatar: myState.avatar,
                     text: messageText.value
                 };
 

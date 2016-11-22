@@ -11,6 +11,9 @@ body {
     color: #333;
 }
 
+.location {
+    margin-left: 8px
+}
 
 .centered {
     margin: 0 auto;
@@ -52,7 +55,6 @@ h1 {
 
 .msg-header {
     position: relative;
-    left: 34px;
 }
 
 .anonymous {
@@ -76,11 +78,7 @@ h1 {
 #send-button {
     background: #e6e6e6;
     text-shadow: 0 1px 0 #f3f3f3;
-    margin: .5em 0 2em 0;
     width: 100%;
-    position: absolute;
-    left: 600px;
-    top: -87px;
 }
 
 #wrapper {
@@ -419,7 +417,7 @@ z-index: 1;
 #console-message-input {
 margin: 0px;
 height: 150px;
-padding: 50px 5.5% 20px;
+padding: 20px 20px 5px 10px;
 font-family: Monaco, mono;
 font-size: 14px;
 resize: none;
@@ -451,14 +449,6 @@ padding-top: 3px;
     right: 15px;
 }
 
-.btn {
-    padding: 10px 27px;
-}
-
-.btn {
-    display: inline-block !important;
-    width: auto !important;
-}
 
 .fa {
     display: inline-block;
@@ -482,6 +472,9 @@ padding-top: 3px;
 }
 
 .btn {
+    padding: 10px 27px;
+    display: inline-block !important;
+    width: auto !important;
     display: inline-block;
     padding: 10px 30px;
     margin-bottom: 0;
