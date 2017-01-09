@@ -64,22 +64,22 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4" style="position: relative;left: -3px;display:block">
-                            <div class="row">
+                        <div id="buddy-area" class="col-md-4" style="position: relative;left: -3px;display:block">
+                            <div id="user-status" class="row">
                                 <div id="user-count-container" class="well col-sm-12">
                                     <p id="presence"><span class="badge"></span></p>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="well col-sm-12" style="height:546px;padding: 18px">
-                                    <ul id="userl" class="list-group">
+                                <div id="buddy-list-container" class="well col-sm-12" style="height:546px;padding: 18px">
+                                    <ul id="buddy-list" class="list-group">
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-8" id="message-area">
-                            <div class="row well">
+                            <div class="row well" id="message-list">
                                 <div id="chat-output" class="col-sm-12">
                                     <ul id="chat-messages" class="list-group">
                                     </ul>
@@ -323,7 +323,7 @@
                     },
                     function(response) {
                         console.log("setState before joinChatRoom: " + JSON.stringify(response));
-                        joinChatRoom();
+                        joinChatRoom(); // is this necessary
                     }
                 );
             }
@@ -347,10 +347,10 @@
                     }, 
                     function (status, response) {
                         if (status.error) {
-                            console.log(status)
+                            console.log(status);
                         } 
                         else {
-                            console.log("message Published w/ timetoken", response.timetoken)
+                            console.log("message Published with timetoken", response.timetoken);
                         }
                     }
                 );

@@ -38,7 +38,7 @@ var UI = {
     },
 
     'clearBuddyList' : function(event) {
-        var userlist = document.querySelector("#userl");
+        var userlist = document.querySelector("#buddy-list");
         
         if (userlist.children) {
             for (var x=0; x <= userlist.children.length; ++x) {
@@ -51,7 +51,7 @@ var UI = {
     },
 
     'handleLeaveEvent' : function(event) {
-        var userlist = document.querySelector("#userl");
+        var userlist = document.querySelector("#buddy-list");
         console.log('received a ' + event.action + ' event');
 
         if (userlist.children) {
@@ -68,7 +68,7 @@ var UI = {
     },
 
     'handleStateChange': function(uuid, state) {
-         var userlist = document.querySelector("#userl");
+         var userlist = document.querySelector("#buddy-list");
          var userElement = null;
         
          if (userlist.children !== 'undefined') {
