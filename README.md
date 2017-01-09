@@ -8,7 +8,7 @@ Very simple Chat implementation used for the Javascript Intro webinar.  The appl
 
 ##Javascript SDK documentation can be found at the link below:
 
-[PubNub Javascript SDK Documentation] (http://www.pubnub.com/docs/javascript/javascript-sdk.html)
+[PubNub Javascript SDK Documentation] (https://www.pubnub.com/docs/javascript/pubnub-javascript-sdk-v4)
 
 
 ### You can launch the app here:
