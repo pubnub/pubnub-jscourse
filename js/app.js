@@ -51,63 +51,54 @@ var UI = {
     },
 
     'handleLeaveEvent' : function(event) {
-        var userlist = document.querySelector("#buddy-list");
-        console.log('received a ' + event.action + ' event');
+        console.log('received a ' + event.action + ' event');        
+        var userElement = document.querySelector("#" + event.uuid)
 
-        if (userlist.children) {
-            for (var x=0; x < userlist.children.length; ++x) {
-                var e = userlist.children[x];
-                if (e.getAttribute('data-uuid') === event.uuid) {
-                    //remove the user that is no longer online
-                    userlist.removeChild(e);
-                }
-            }
+        if (userElement != undefined) {
+            console.log('removing uuid: ' + event.uuid);
+            userElement.remove();
         }
 
         UI.updateRoomCount(event.occupancy);
     },
 
     'handleStateChange': function(uuid, state) {
-         var userlist = document.querySelector("#buddy-list");
-         var userElement = null;
-        
-         if (userlist.children !== 'undefined') {
-             for (var x=0; x < userlist.children.length; ++x) {
-                var e = userlist.children[x];
-                if (e.getAttribute("data-uuid") === uuid) {
-                    userElement = e;
-                    break;
-                }
+        try {
+            var userlist = document.querySelector("#buddy-list");
+            var userElement = document.querySelector("#" + uuid);
+            var userDiv = null;
+            var li = null;
+
+            if (userElement != null) {
+                console.log('found existing element');
+                userDiv = userElement.firstChild;
+                li = userElement;
             }
-        }
+            else {
+                li = document.createElement('li');
+                userDiv = document.createElement("div");
+            }
 
-        var userDiv = null;
-        var li = null;
+            userDiv.className = 'user-presence-container';
+            if (state == undefined) {
+                state = {};
+                state.username = "anonymous";
+            }
+            
+            userDiv.innerHTML = '<div class="row"><div class="col-sm-8"><h4>' + state.username + 
+                '</h4></div></div> <div class="row"><div class="col-sm-8 location">' + state.location + '</div></div>';
 
-        if (userElement != null) {
-            console.log('found existing element');
-            userDiv = userElement.firstChild;
-            li = userElement;
-        }
-        else {
-            li = document.createElement('li');
-            userDiv = document.createElement("div");
-        }
-
-        userDiv.className = 'user-presence-container';
-        if (state == undefined) {
-            state = {};
-            state.username = "anonymous";
-        }
-        
-        userDiv.innerHTML = '<div class="row"><div class="col-sm-8"><h4>' + state.username + 
-            '</h4></div></div> <div class="row"><div class="col-sm-8 location">' + state.location + '</div></div>';
-
-        if (userElement === null) {
-            li.appendChild(userDiv);
-            li.setAttribute("class","list-group-item online");
-            li.setAttribute("data-uuid", uuid);
-            userlist.appendChild(li);
+            if (userElement === null) {
+                li.appendChild(userDiv);
+                li.setAttribute("class","list-group-item online");
+                // li.setAttribute("data-uuid", uuid);
+                li.setAttribute("id", uuid);
+                userlist.appendChild(li);
+            }
+        } // try
+        catch (err) {
+            // couldn't find element with id
+            // do nothing
         }
     },
 
